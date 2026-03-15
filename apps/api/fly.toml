@@ -1,0 +1,18 @@
+# fly.toml app configuration file
+
+app = "waterting-api"
+primary_region = "bos" # Change to nearer region like "maa" (Mumbai) or "bom" during launch
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
