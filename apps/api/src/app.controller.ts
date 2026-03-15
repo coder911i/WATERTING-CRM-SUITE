@@ -3,7 +3,16 @@ import { Controller, Get } from '@nestjs/common';
 @Controller()
 export class AppController {
   @Get('health')
-  getHealth() {
-    return { status: 'ok', timestamp: new Date() };
+  health() {
+    return { 
+      status: 'ok', 
+      timestamp: new Date(),
+      environment: process.env.NODE_ENV 
+    };
+  }
+
+  @Get('api/health')
+  apiHealth() {
+    return this.health();
   }
 }
