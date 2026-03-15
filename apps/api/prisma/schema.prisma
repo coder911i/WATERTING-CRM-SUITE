@@ -1,0 +1,243 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String       @id @default(cuid())
+  name      String
+  slug      String       @unique
+  plan      Plan         @default(STARTER)
+  status    TenantStatus @default(ACTIVE)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  users     User[]
+  projects  Project[]
+  leads     Lead[]
+}
+
+model User {
+  id            String    @id @default(cuid())
+  tenantId      String
+  email         String
+  passwordHash  String
+  name          String
+  phone         String?
+  role          UserRole
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+  assignedLeads Lead[]    @relation("AssignedAgent")
+  activities    Activity[]
+  siteVisits    SiteVisit[]
+  @@unique([tenantId, email])
+  @@index([tenantId])
+}
+
+model Project {
+  id             String        @id @default(cuid())
+  tenantId       String
+  name           String
+  location       String
+  city           String?
+  state          String?
+  projectType    ProjectType
+  status         ProjectStatus @default(ACTIVE)
+  reraNumber     String?
+  possessionDate DateTime?
+  amenities      String[]      @default([])
+  images         String[]      @default([])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  tenant         Tenant        @relation(fields: [tenantId], references: [id])
+  towers         Tower[]
+  leads          Lead[]
+  @@index([tenantId])
+}
+
+model Tower {
+  id          String  @id @default(cuid())
+  projectId   String
+  name        String
+  totalFloors Int
+  project     Project @relation(fields: [projectId], references: [id])
+  units       Unit[]
+}
+
+model Unit {
+  id               String     @id @default(cuid())
+  towerId          String
+  unitNumber       String
+  floor            Int
+  bhkType          String
+  carpetArea       Float
+  superArea        Float?
+  facing           String?
+  basePrice        Float
+  totalPrice       Float
+  status           UnitStatus @default(AVAILABLE)
+  floorPlanUrl     String?
+  reservedUntil    DateTime?
+  reservedForLeadId String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  tower            Tower      @relation(fields: [towerId], references: [id])
+  @@index([towerId, status])
+}
+
+model Lead {
+  id              String        @id @default(cuid())
+  tenantId        String
+  projectId       String?
+  assignedToId    String?
+  name            String
+  phone           String
+  email           String?
+  budgetMin       Float?
+  budgetMax       Float?
+  bhkPreference   String[]      @default([])
+  source          LeadSource
+  sourceName      String?
+  stage           PipelineStage @default(NEW_LEAD)
+  priority        Priority      @default(NORMAL)
+  tags            String[]      @default([])
+  notes           String?
+  isActive        Boolean       @default(true)
+  firstContactedAt DateTime?
+  lastActivityAt  DateTime?
+  nextFollowUpAt  DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  tenant          Tenant        @relation(fields: [tenantId], references: [id])
+  project         Project?      @relation(fields: [projectId], references: [id])
+  assignedTo      User?         @relation("AssignedAgent", fields: [assignedToId], references: [id])
+  activities      Activity[]
+  siteVisits      SiteVisit[]
+  @@index([tenantId, stage])
+  @@index([tenantId, assignedToId])
+  @@index([phone, tenantId])
+}
+
+model SiteVisit {
+  id              String        @id @default(cuid())
+  leadId          String
+  agentId         String?
+  scheduledAt     DateTime
+  notes           String?
+  outcome         VisitOutcome?
+  outcomeNotes    String?
+  followUpDate    DateTime?
+  reminder24hSent Boolean       @default(false)
+  reminder2hSent  Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  lead            Lead          @relation(fields: [leadId], references: [id])
+  agent           User?         @relation(fields: [agentId], references: [id])
+}
+
+model Activity {
+  id          String       @id @default(cuid())
+  leadId      String
+  userId      String?
+  type        ActivityType
+  description String
+  metadata    Json         @default("{}")
+  createdAt   DateTime     @default(now())
+  lead        Lead         @relation(fields: [leadId], references: [id])
+  user        User?        @relation(fields: [userId], references: [id])
+  @@index([leadId])
+}
+
+enum Plan {
+  STARTER
+  GROWTH
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+}
+
+enum UserRole {
+  TENANT_ADMIN
+  SALES_MANAGER
+  SALES_AGENT
+}
+
+enum ProjectType {
+  RESIDENTIAL
+  COMMERCIAL
+  PLOTTED
+  VILLA
+}
+
+enum ProjectStatus {
+  ACTIVE
+  SOLD_OUT
+  ON_HOLD
+  ARCHIVED
+}
+
+enum UnitStatus {
+  AVAILABLE
+  RESERVED
+  BOOKED
+  SOLD
+  BLOCKED
+}
+
+enum LeadSource {
+  MANUAL
+  WEBSITE
+  FACEBOOK
+  GOOGLE
+  WHATSAPP
+  PORTAL_99ACRES
+  PORTAL_MAGICBRICKS
+  BROKER
+}
+
+enum PipelineStage {
+  NEW_LEAD
+  CONTACTED
+  INTERESTED
+  VISIT_SCHEDULED
+  VISIT_DONE
+  NEGOTIATION
+  BOOKING_DONE
+  LOST
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum VisitOutcome {
+  INTERESTED
+  FOLLOW_UP
+  NOT_INTERESTED
+  NO_SHOW
+}
+
+enum ActivityType {
+  CALL
+  WHATSAPP
+  EMAIL
+  NOTE
+  STAGE_CHANGE
+  VISIT_SCHEDULED
+  DOCUMENT_SENT
+  SYSTEM
+}
+

@@ -1,0 +1,17 @@
+{
+  "name": "waterting-crm-suite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WATERTING — Real Estate Sales CRM",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "start": "turbo start"
+  },
+  "devDependencies": {
+    "turbo": "^1.12.0"
+  }
+}

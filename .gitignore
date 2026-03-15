@@ -1,0 +1,22 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Next.js
+.next/
+out/
+
+# NestJS
+dist/
+*.tsbuildinfo
+
+# Prisma
+.env
+prisma/migrations
+
+# Docker
+.docker
+
+# OS
+.DS_Store
+Thumbs.db
