@@ -9,4 +9,4 @@ cmds = ["npm ci"]
 cmds = ["npm run build --workspace=api"]
 
 [start]
-cmd = "cd /app/apps/api && node dist/main.js"
+cmd = "node /app/apps/api/dist/main.js"
