@@ -1,0 +1,14 @@
+# railway.toml
+# This file forces Railway to run the correct build sequence (Prisma first) without you clicking anything.
+
+[build]
+builder = "nixpacks"
+
+[build.nixpacks]
+buildCommand = "npx prisma generate && npm run build --workspace=api"
+
+[deploy]
+startCommand = "node apps/api/dist/main.js"
+restartPolicy = "on-failure"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 10
