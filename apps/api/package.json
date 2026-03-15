@@ -13,7 +13,7 @@
     "test": "jest",
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config test/jest-e2e.config.ts",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/main.js",
     "start:migrate": "prisma migrate deploy && node dist/main"
   },
   "dependencies": {
