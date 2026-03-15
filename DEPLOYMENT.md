@@ -46,11 +46,10 @@ Inside the Railway app Dashboard for your Service, click **Variables** and add:
 -   `REDIS_HOST`: *(Upstash host string)*
 -   `REDIS_PORT`: *(Upstash port)*
 -   `REDIS_PASSWORD`: *(Upstash password)*
--   `OPENAI_API_KEY`: *(Your key)*
+-   `NVIDIA_API_KEY`: *(Your `nvapi-...` key that you provided)*
 -   `PINECONE_API_KEY`: *(Your key)*
 -   `PINECONE_ENVIRONMENT`: *(e.g., us-east-1)*
--   `ELEVENLABS_API_KEY`: *(Your key)*
--   `JWT_SECRET`: *(Generate a strong random string)*
+-   `JWT_SECRET`: *(Generate a random string for auth)*
 
 ### 4. Deploy 🚀
 Railway will build the image, run `prisma generate`, and host it on a public subdomain like `your-backend.up.railway.app`.
@@ -84,7 +83,7 @@ Cloudflare will build and assign a free `.pages.dev` subdomain automatically.
 ## 🔗 Step 5: Connecting the Two
 Once both are live, you may experience **CORS (Cross-Origin Resource Sharing)** blocks if you don't allow Cloudflare's domain to access Railway.
 
-*   To fix, ensure your NestJS `main.ts` inside `apps/api` allows CORS:
+*   To fix, ensure your NestJS `main.ts` inside `apps/api` allows CORS layout:
     ```typescript
     app.enableCors({ origin: 'https://[your-cloudflare-page].pages.dev' });
     ```
@@ -92,5 +91,7 @@ Once both are live, you may experience **CORS (Cross-Origin Resource Sharing)** 
 
 ---
 
-### 🎉 You are Live!
+### 🎉 All Agents Running on NVIDIA NIM!
+The agents are fully updated to run `nvidia/llama-3.1-nemotron-70b-instruct` layout dashboards. 
+
 Type **"Check URLs"** once deployed to simulate visual verification triggers!
