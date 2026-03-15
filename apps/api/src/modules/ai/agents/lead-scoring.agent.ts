@@ -9,7 +9,10 @@ export class LeadScoringAgent {
   private openai: OpenAI;
 
   constructor(private readonly prisma: PrismaService) {
-    this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
+    this.openai = new OpenAI({ 
+      apiKey: process.env.NVIDIA_API_KEY || 'placeholder',
+      baseURL: 'https://integrate.api.nvidia.com/v1' 
+    });
   }
 
   async scoreLead(leadId: string) {
@@ -38,12 +41,11 @@ Lead Data:
 
     try {
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o',
+        model: 'nvidia/llama-3.1-nemotron-70b-instruct',
         messages: [
-          { role: 'system', content: SCORING_SYSTEM_PROMPT },
+          { role: 'system', content: SCORING_SYSTEM_PROMPT.replace('You are an AI Sales Agent', 'You are an AI Sales Agent. Respond ONLY in valid JSON format.') },
           { role: 'user', content: prompt },
         ],
-        response_format: { type: 'json_object' },
       });
 
       const result = JSON.parse(response.choices[0].message.content || '{}');

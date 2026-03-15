@@ -9,7 +9,10 @@ export class LeadDiscoveryAgent {
   private openai: OpenAI;
 
   constructor(private readonly prisma: PrismaService) {
-    this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
+    this.openai = new OpenAI({ 
+      apiKey: process.env.NVIDIA_API_KEY || 'placeholder',
+      baseURL: 'https://integrate.api.nvidia.com/v1' 
+    });
   }
 
   async runDiscovery(tenantId: string) {
@@ -28,12 +31,11 @@ export class LeadDiscoveryAgent {
 
     try {
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o',
+        model: 'nvidia/llama-3.1-nemotron-70b-instruct',
         messages: [
-          { role: 'system', content: DISCOVERY_SYSTEM_PROMPT },
+          { role: 'system', content: DISCOVERY_SYSTEM_PROMPT.replace('You are an AI Lead Generation Specialist', 'You are an AI Lead Generation Specialist. Respond ONLY with a valid JSON object.') },
           { role: 'user', content: mockCrawlerResults },
         ],
-        response_format: { type: 'json_object' },
       });
 
       const parsed = JSON.parse(response.choices[0].message.content || '{}');

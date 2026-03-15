@@ -15,8 +15,9 @@ export class AnalyticsAgent {
     this.logger.log(`Running analytics query for tenant ${tenantId}`);
 
     const model = new ChatOpenAI({
-      openAIApiKey: process.env.OPENAI_API_KEY || 'placeholder',
-      modelName: 'gpt-4o',
+      openAIApiKey: process.env.NVIDIA_API_KEY || 'placeholder',
+      configuration: { baseURL: 'https://integrate.api.nvidia.com/v1' },
+      modelName: 'nvidia/llama-3.1-nemotron-70b-instruct',
       temperature: 0.2, 
     });
 

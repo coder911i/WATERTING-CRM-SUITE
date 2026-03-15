@@ -15,7 +15,10 @@ export class PropertyRecommendationAgent {
     private readonly pinecone: PineconeService,
     private readonly leadEmbedder: LeadEmbedder,
   ) {
-    this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' });
+    this.openai = new OpenAI({ 
+      apiKey: process.env.NVIDIA_API_KEY || 'placeholder',
+      baseURL: 'https://integrate.api.nvidia.com/v1' 
+    });
   }
 
   async recommendProperties(leadId: string) {
@@ -55,7 +58,7 @@ ${units.map((u, i) => `${i+1}. ${u.tower.project.name} - ${u.tower.name} - Unit 
 `;
 
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o',
+        model: 'nvidia/llama-3.1-nemotron-70b-instruct',
         messages: [
           { role: 'system', content: RECOMMENDATION_SYSTEM_PROMPT },
           { role: 'user', content: prompt },
