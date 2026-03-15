@@ -12,6 +12,16 @@ import { ActivitiesModule } from './modules/activities/activities.module';
 import { PipelineModule } from './modules/pipeline/pipeline.module';
 import { SiteVisitsModule } from './modules/site-visits/site-visits.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { BullModule } from '@nestjs/bull';
+import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
+import { PortalsModule } from './modules/portals/portals.module';
+import { FacebookModule } from './modules/facebook/facebook.module';
+import { BrokersModule } from './modules/brokers/brokers.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { AutomationModule } from './modules/automation/automation.module';
+import { PortalModule } from './modules/portal/portal.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -33,6 +43,21 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
     PipelineModule,
     SiteVisitsModule,
     AnalyticsModule,
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT as string) || 6379,
+      },
+    }),
+    WhatsappModule,
+    PortalsModule,
+    FacebookModule,
+    BrokersModule,
+    BookingsModule,
+    PaymentsModule,
+    AutomationModule,
+    PortalModule,
+    AiModule,
   ],
 })
 export class AppModule {}

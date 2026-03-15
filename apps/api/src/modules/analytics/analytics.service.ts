@@ -46,4 +46,79 @@ export class AnalyticsService {
     return distribution;
 
   }
+
+  async getBrokerPerformance(tenantId: string) {
+    const brokers = await this.prisma.broker.findMany({
+      where: { tenantId },
+      include: {
+        _count: { select: { leads: true } },
+        commissions: { select: { amount: true, status: true } },
+      },
+    });
+
+    return brokers.map(b => {
+      const totalCommission = b.commissions.reduce((sum, c) => sum + c.amount, 0);
+      const paidCommission = b.commissions.filter(c => c.status === 'PAID').reduce((sum, c) => sum + c.amount, 0);
+      return {
+        id: b.id,
+        name: b.name,
+        leadsCount: b._count.leads,
+        totalCommission,
+        paidCommission,
+      };
+    });
+  }
+
+  async getProjectSales(tenantId: string) {
+    const projects = await this.prisma.project.findMany({
+      where: { tenantId },
+      include: {
+        towers: {
+          include: {
+            units: {
+              include: { booking: { select: { totalAmount: true } } }
+            }
+          }
+        }
+      }
+    });
+
+    return projects.map(p => {
+      let totalSales = 0;
+      let bookingsCount = 0;
+      p.towers.forEach(t => {
+        t.units.forEach(u => {
+          if (u.booking) {
+            totalSales += u.booking.totalAmount;
+            bookingsCount++;
+          }
+        });
+      });
+      return {
+        id: p.id,
+        name: p.name,
+        totalSales,
+        bookingsCount,
+      };
+    });
+  }
+
+  async getPaymentForecast(tenantId: string) {
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+    const pendingPayments = await this.prisma.payment.findMany({
+      where: {
+        booking: { tenantId },
+        status: 'PENDING',
+        dueDate: { lte: thirtyDaysFromNow },
+      },
+      select: { amount: true },
+    });
+
+    return {
+      forecastAmount: pendingPayments.reduce((sum, p) => sum + p.amount, 0),
+      count: pendingPayments.length,
+    };
+  }
 }

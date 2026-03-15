@@ -15,9 +15,12 @@ model Tenant {
   status    TenantStatus @default(ACTIVE)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
-  users     User[]
-  projects  Project[]
-  leads     Lead[]
+  users       User[]
+  projects    Project[]
+  leads       Lead[]
+  brokers     Broker[]
+  bookings    Booking[]
+  automations Automation[]
 }
 
 model User {
@@ -87,6 +90,7 @@ model Unit {
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
   tower            Tower      @relation(fields: [towerId], references: [id])
+  booking          Booking?
   @@index([towerId, status])
 }
 
@@ -118,6 +122,19 @@ model Lead {
   assignedTo      User?         @relation("AssignedAgent", fields: [assignedToId], references: [id])
   activities      Activity[]
   siteVisits      SiteVisit[]
+  brokerId        String?
+  broker          Broker?       @relation(fields: [brokerId], references: [id])
+  booking         Booking?
+  whatsappOptOut  Boolean       @default(false)
+  
+  // AI Fields thresholds triggers layout managers
+  aiScore           Float?
+  aiScoreLabel      String?
+  aiHandoffRequested Boolean @default(false)
+  aiInteractions    AiInteraction[]
+  aiCalls           AiCall[]
+  aiRecommendations AiRecommendation[]
+
   @@index([tenantId, stage])
   @@index([tenantId, assignedToId])
   @@index([phone, tenantId])
@@ -241,3 +258,226 @@ enum ActivityType {
   SYSTEM
 }
 
+model Broker {
+  id             String           @id @default(cuid())
+  tenantId       String
+  name           String
+  phone          String
+  email          String?
+  reraNumber     String?
+  firmName       String?
+  referralCode   String           @unique
+  commissionPct  Float            @default(2.0)
+  isActive       Boolean          @default(true)
+  isApproved     Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  tenant         Tenant           @relation(fields: [tenantId], references: [id])
+  leads          Lead[]
+  commissions    Commission[]
+  @@index([tenantId])
+}
+
+model Booking {
+  id             String        @id @default(cuid())
+  tenantId       String
+  leadId         String        @unique
+  unitId         String        @unique
+  tokenAmount    Float
+  totalAmount    Float
+  bookingDate    DateTime      @default(now())
+  status         BookingStatus @default(ACTIVE)
+  documents      Json          @default("[]")
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  tenant         Tenant        @relation(fields: [tenantId], references: [id])
+  lead           Lead          @relation(fields: [leadId], references: [id])
+  unit           Unit          @relation(fields: [unitId], references: [id])
+  payments       Payment[]
+  commission     Commission?
+  @@index([tenantId])
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  bookingId         String
+  amount            Float
+  dueDate           DateTime
+  paidAt            DateTime?
+  method            PaymentMethod?
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  receiptUrl        String?
+  status            PaymentStatus @default(PENDING)
+  createdAt         DateTime      @default(now())
+  booking           Booking       @relation(fields: [bookingId], references: [id])
+  @@index([bookingId])
+}
+
+model Commission {
+  id         String           @id @default(cuid())
+  bookingId  String           @unique
+  brokerId   String
+  amount     Float
+  percentage Float
+  status     CommissionStatus @default(PENDING)
+  paidAt     DateTime?
+  notes      String?
+  createdAt  DateTime         @default(now())
+  booking    Booking          @relation(fields: [bookingId], references: [id])
+  broker     Broker           @relation(fields: [brokerId], references: [id])
+}
+
+model Automation {
+  id          String    @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  trigger     Json
+  conditions  Json      @default("[]")
+  actions     Json
+  isEnabled   Boolean   @default(true)
+  runCount    Int       @default(0)
+  lastRunAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  logs        AutomationLog[]
+  @@index([tenantId])
+}
+
+model AutomationLog {
+  id           String    @id @default(cuid())
+  automationId String
+  leadId       String?
+  status       String
+  output       Json      @default("{}")
+  runAt        DateTime  @default(now())
+  automation   Automation @relation(fields: [automationId], references: [id])
+  @@index([automationId])
+}
+
+model WhatsAppMessage {
+  id          String    @id @default(cuid())
+  tenantId    String
+  leadId      String
+  direction   String
+  message     String
+  templateId  String?
+  status      String    @default("SENT")
+  waMessageId String?
+  sentAt      DateTime  @default(now())
+  @@index([tenantId, leadId])
+}
+
+enum BookingStatus {
+  ACTIVE
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  ONLINE_RAZORPAY
+  CHEQUE
+  NEFT_RTGS
+  CASH
+}
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  PAID
+  DISPUTED
+}
+
+
+
+enum AiAgentType { 
+  SCORING 
+  WHATSAPP_CONVERSATION 
+  CALLING
+  RECOMMENDATION 
+  ANALYTICS 
+  DISCOVERY 
+}
+
+enum CallStatus { 
+  INITIATED 
+  RINGING 
+  IN_PROGRESS 
+  COMPLETED
+  FAILED 
+  NO_ANSWER 
+  TRANSFERRED 
+}
+
+model AiInteraction {
+  id           String      @id @default(cuid())
+  tenantId     String
+  leadId       String
+  agentType    AiAgentType
+  input        Json
+  output       Json
+  tokensUsed   Int         @default(0)
+  durationMs   Int         @default(0)
+  modelUsed    String?
+  wasEscalated Boolean     @default(false)
+  escalatedAt  DateTime?
+  createdAt    DateTime    @default(now())
+  lead         Lead        @relation(fields: [leadId], references: [id])
+  @@index([tenantId, leadId])
+  @@index([agentType])
+}
+
+model AiCall {
+  id             String     @id @default(cuid())
+  tenantId       String
+  leadId         String
+  status         CallStatus
+  duration       Int        @default(0)
+  recordingUrl   String?
+  transcript     String?
+  summary        String?
+  extractedData  Json       @default("{}")
+  visitBooked    Boolean    @default(false)
+  escalatedToId  String?
+  startedAt      DateTime   @default(now())
+  endedAt        DateTime?
+  lead           Lead       @relation(fields: [leadId], references: [id])
+  @@index([tenantId, leadId])
+}
+
+model AiRecommendation {
+  id           String   @id @default(cuid())
+  tenantId     String
+  leadId       String
+  unitIds      String[]
+  reasoning    String
+  score        Float[]
+  wasShown     Boolean  @default(false)
+  wasClicked   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  lead         Lead     @relation(fields: [leadId], references: [id])
+  @@index([tenantId, leadId])
+}
+
+model AiInsight {
+  id        String   @id @default(cuid())
+  tenantId  String
+  type      String
+  title     String
+  body      String
+  data      Json     @default("{}")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  @@index([tenantId])
+}

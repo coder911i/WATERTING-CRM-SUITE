@@ -26,4 +26,22 @@ export class AnalyticsController {
   async getLeadsByStatus(@CurrentUser() user: any) {
     return this.analyticsService.getLeadsByStatus(user.tenantId);
   }
+
+  @Get('brokers')
+  @ApiOperation({ summary: 'Get broker performance stats' })
+  async getBrokerPerformance(@CurrentUser() user: any) {
+    return this.analyticsService.getBrokerPerformance(user.tenantId);
+  }
+
+  @Get('projects')
+  @ApiOperation({ summary: 'Get project sales stats' })
+  async getProjectSales(@CurrentUser() user: any) {
+    return this.analyticsService.getProjectSales(user.tenantId);
+  }
+
+  @Get('forecast')
+  @ApiOperation({ summary: 'Get payment collection forecast for next 30 days' })
+  async getPaymentForecast(@CurrentUser() user: any) {
+    return this.analyticsService.getPaymentForecast(user.tenantId);
+  }
 }

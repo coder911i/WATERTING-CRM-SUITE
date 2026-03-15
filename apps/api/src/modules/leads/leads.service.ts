@@ -3,10 +3,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
 import { PipelineStage } from '@prisma/client';
+import { AiService } from '../ai/ai.service';
 
 @Injectable()
 export class LeadsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private aiService: AiService,
+  ) {}
 
   async findAll(tenantId: string, filters: { stage?: PipelineStage; source?: any; agentId?: string; search?: string }, page = 1, limit = 25) {
     const skip = (page - 1) * limit;
@@ -34,9 +38,13 @@ export class LeadsService {
     });
     if (existing) throw new ConflictException('Lead with this phone number already exists');
 
-    return this.prisma.lead.create({
+    const lead = await this.prisma.lead.create({
       data: { ...dto, tenantId },
     });
+
+    await this.aiService.triggerScoring(lead.id);
+
+    return lead;
   }
 
   async findOne(id: string, tenantId: string) {
@@ -69,8 +77,8 @@ export class LeadsService {
   }
 
   async changeStage(id: string, tenantId: string, stage: PipelineStage, userId?: string) {
-    return this.prisma.$transaction(async (tx) => {
-      const lead = await tx.lead.update({
+    const lead = await this.prisma.$transaction(async (tx) => {
+      const updatedLead = await tx.lead.update({
         where: { id },
         data: { stage },
       });
@@ -82,8 +90,12 @@ export class LeadsService {
           description: `Stage changed to ${stage}`,
         },
       });
-      return lead;
+      return updatedLead;
     });
+
+    await this.aiService.triggerScoring(id);
+
+    return lead;
   }
 
   async assign(id: string, tenantId: string, agentId?: string) {
