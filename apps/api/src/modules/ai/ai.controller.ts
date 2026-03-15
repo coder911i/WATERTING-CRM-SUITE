@@ -1,9 +1,12 @@
-import { Controller, Post, Param, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Param, Get, UseGuards, Req, Body } from '@nestjs/common';
 import { AiService } from './ai.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { PrismaService } from '../prisma/prisma.service';
 import { PropertyRecommendationAgent } from './agents/property-recommendation.agent';
+import { SalesCallingAgent } from './agents/sales-calling.agent';
+import { AnalyticsAgent } from './agents/analytics.agent';
+import { LeadDiscoveryAgent } from './agents/lead-discovery.agent';
 
 @ApiTags('AI')
 @Controller('ai')
@@ -13,6 +16,9 @@ export class AiController {
     private readonly aiService: AiService,
     private readonly prisma: PrismaService,
     private readonly recommendAgent: PropertyRecommendationAgent,
+    private readonly salesAgent: SalesCallingAgent,
+    private readonly analyticsAgent: AnalyticsAgent,
+    private readonly discoveryAgent: LeadDiscoveryAgent,
   ) {}
 
   @Post('score/:leadId')
@@ -42,5 +48,41 @@ export class AiController {
   @ApiOperation({ summary: 'Generate recommendations for a lead' })
   async recommendProperties(@Param('leadId') leadId: string) {
     return this.recommendAgent.recommendProperties(leadId);
+  }
+
+  @Post('call/:leadId')
+  @ApiOperation({ summary: 'Trigger AI outbound call for a lead' })
+  async triggerCall(@Param('leadId') leadId: string) {
+    return this.salesAgent.triggerCall(leadId);
+  }
+
+  @Post('call/webhook/:callId')
+  @ApiOperation({ summary: 'Handle call webhook triggers' })
+  async handleCallWebhook(@Param('callId') callId: string, @Req() req: any) {
+    return this.salesAgent.handleWebhook(callId, req.body);
+  }
+
+  @Get('insights')
+  @ApiOperation({ summary: 'List periodic AI insights' })
+  async listInsights(@Req() req: any) {
+    const tenantId = req.user.tenantId;
+    return (this.prisma as any).aiInsight.findMany({
+      where: { tenantId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  @Post('analytics/query')
+  @ApiOperation({ summary: 'Ask analytics agent a question' })
+  async queryAnalytics(@Body('question') question: string, @Req() req: any) {
+    const tenantId = req.user.tenantId;
+    return this.analyticsAgent.runQuery(tenantId, question);
+  }
+
+  @Post('discovery/trigger')
+  @ApiOperation({ summary: 'Trigger AI lead discovery search' })
+  async triggerDiscovery(@Req() req: any) {
+    const tenantId = req.user.tenantId;
+    return this.discoveryAgent.runDiscovery(tenantId);
   }
 }

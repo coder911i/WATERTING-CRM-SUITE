@@ -45,6 +45,7 @@ export default function LeadsPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stage</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AI Score</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
               </tr>
@@ -63,13 +64,26 @@ export default function LeadsPage() {
                       {lead.stage.toLowerCase().replace('_', ' ')}
                     </span>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    {lead.aiScore ? (
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        lead.aiScoreLabel === 'HOT' ? 'bg-red-100 text-red-800' : 
+                        lead.aiScoreLabel === 'WARM' ? 'bg-orange-100 text-orange-800' : 
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        {lead.aiScore}% {lead.aiScoreLabel}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400 text-xs">-</span>
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹{lead.budgetMax?.toLocaleString() || 'N/A'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{lead.source.toLowerCase()}</td>
                 </tr>
               ))}
               {(!leads || leads.length === 0) && (
                 <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500" colSpan={5}>No leads found.</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500" colSpan={6}>No leads found.</td>
                 </tr>
               )}
             </tbody>

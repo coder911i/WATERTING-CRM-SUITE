@@ -22,6 +22,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { AutomationModule } from './modules/automation/automation.module';
 import { PortalModule } from './modules/portal/portal.module';
 import { AiModule } from './modules/ai/ai.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AiModule } from './modules/ai/ai.module';
       ttl: 60,
       limit: 100,
     }]),
+    ScheduleModule.forRoot(),
     PrismaModule,
     AuthModule,
     TenantsModule,

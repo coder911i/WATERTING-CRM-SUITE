@@ -4,12 +4,14 @@ import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
 import { PipelineStage } from '@prisma/client';
 import { AiService } from '../ai/ai.service';
+import { PropertyRecommendationAgent } from '../ai/agents/property-recommendation.agent';
 
 @Injectable()
 export class LeadsService {
   constructor(
     private prisma: PrismaService,
     private aiService: AiService,
+    private recommendAgent: PropertyRecommendationAgent,
   ) {}
 
   async findAll(tenantId: string, filters: { stage?: PipelineStage; source?: any; agentId?: string; search?: string }, page = 1, limit = 25) {
@@ -94,6 +96,10 @@ export class LeadsService {
     });
 
     await this.aiService.triggerScoring(id);
+
+    if (stage === 'CONTACTED') {
+      this.recommendAgent.recommendProperties(id).catch(() => {}); // Fire and forget triggers thresholds
+    }
 
     return lead;
   }

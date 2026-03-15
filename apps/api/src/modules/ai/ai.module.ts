@@ -15,6 +15,10 @@ import { VisitBookingTool } from './tools/visit-booking.tool';
 import { CrmUpdateTool } from './tools/crm-update.tool';
 import { AiRedisService } from './redis.service';
 import { PropertyRecommendationAgent } from './agents/property-recommendation.agent';
+import { SalesCallingAgent } from './agents/sales-calling.agent';
+import { AnalyticsAgent } from './agents/analytics.agent';
+import { InsightsCron } from './insights.cron';
+import { LeadDiscoveryAgent } from './agents/lead-discovery.agent';
 
 @Module({
   imports: [
@@ -36,7 +40,11 @@ import { PropertyRecommendationAgent } from './agents/property-recommendation.ag
     CrmUpdateTool,
     AiRedisService,
     PropertyRecommendationAgent,
+    SalesCallingAgent,
+    AnalyticsAgent,
+    InsightsCron,
+    LeadDiscoveryAgent,
   ],
-  exports: [AiService, PineconeService, UnitEmbedder, LeadEmbedder],
+  exports: [AiService, PineconeService, UnitEmbedder, LeadEmbedder, PropertyRecommendationAgent],
 })
 export class AiModule {}
