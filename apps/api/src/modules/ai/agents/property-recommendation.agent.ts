@@ -38,13 +38,21 @@ export class PropertyRecommendationAgent {
       const matches = await this.pinecone.queryVectors(`${lead.tenantId}-units`, vector, 3);
       if (matches.length === 0) return { message: 'No matching properties found in vector space' };
 
-      const unitIds = matches.map(m => m.id);
+      const unitIds = matches.map((m: { id: string }) => m.id);
 
       // 3. Fetch Units from Prisma thresholds triggers layout
       const units = await this.prisma.unit.findMany({
         where: { id: { in: unitIds } },
         include: { tower: { include: { project: true } } },
       });
+
+      type RecommendedUnit = {
+        unitNumber: string;
+        bhkType: string;
+        totalPrice: number;
+        floor: number | null;
+        tower: { name: string; project: { name: string } };
+      };
 
       // 4. OpenAI Prompt thresholds triggers layout
       const prompt = `
@@ -53,7 +61,7 @@ Lead Profile:
 - BHK Pref: ${lead.bhkPreference?.join(', ') || 'N/A'}
 
 Top Matching Units from Vector Search:
-${units.map((u, i) => `${i+1}. ${u.tower.project.name} - ${u.tower.name} - Unit ${u.unitNumber} (${u.bhkType})
+${units.map((u: RecommendedUnit, i: number) => `${i+1}. ${u.tower.project.name} - ${u.tower.name} - Unit ${u.unitNumber} (${u.bhkType})
    Price: ${u.totalPrice} | Floor: ${u.floor}`).join('\n')}
 `;
 

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
-import { PipelineStage } from '@prisma/client';
+import { PipelineStage, Prisma } from '@prisma/client';
 import { AiService } from '../ai/ai.service';
 import { PropertyRecommendationAgent } from '../ai/agents/property-recommendation.agent';
 
@@ -79,7 +79,7 @@ export class LeadsService {
   }
 
   async changeStage(id: string, tenantId: string, stage: PipelineStage, userId?: string) {
-    const lead = await this.prisma.$transaction(async (tx) => {
+    const lead = await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const updatedLead = await tx.lead.update({
         where: { id },
         data: { stage },

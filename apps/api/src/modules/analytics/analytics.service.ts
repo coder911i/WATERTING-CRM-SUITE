@@ -18,9 +18,9 @@ export class AnalyticsService {
     ]);
 
     const inventory = {
-      available: units.filter(u => u.status === UnitStatus.AVAILABLE).length,
-      reserved: units.filter(u => u.status === UnitStatus.RESERVED).length,
-      sold: units.filter(u => u.status === UnitStatus.SOLD || u.status === UnitStatus.BOOKED).length,
+      available: units.filter((u: { status: UnitStatus }) => u.status === UnitStatus.AVAILABLE).length,
+      reserved: units.filter((u: { status: UnitStatus }) => u.status === UnitStatus.RESERVED).length,
+      sold: units.filter((u: { status: UnitStatus }) => u.status === UnitStatus.SOLD || u.status === UnitStatus.BOOKED).length,
     };
 
     return {
@@ -39,9 +39,9 @@ export class AnalyticsService {
 
     const stages = Object.values(PipelineStage);
     const distribution = stages.reduce<Record<PipelineStage, number>>((acc, stage) => {
-      acc[stage] = leads.filter(l => l.stage === stage).length;
+      acc[stage] = leads.filter((l: { stage: PipelineStage }) => l.stage === stage).length;
       return acc;
-    }, {} as any);
+    }, {} as Record<PipelineStage, number>);
 
     return distribution;
 
@@ -57,8 +57,8 @@ export class AnalyticsService {
     });
 
     return brokers.map(b => {
-      const totalCommission = b.commissions.reduce((sum, c) => sum + c.amount, 0);
-      const paidCommission = b.commissions.filter(c => c.status === 'PAID').reduce((sum, c) => sum + c.amount, 0);
+      const totalCommission = b.commissions.reduce((sum: number, c: { amount: number; status: string }) => sum + c.amount, 0);
+      const paidCommission = b.commissions.filter((c: { amount: number; status: string }) => c.status === 'PAID').reduce((sum: number, c: { amount: number; status: string }) => sum + c.amount, 0);
       return {
         id: b.id,
         name: b.name,

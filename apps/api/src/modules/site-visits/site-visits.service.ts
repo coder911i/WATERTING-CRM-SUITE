@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSiteVisitDto } from './dto/create-site-visit.dto';
 import { UpdateSiteVisitDto } from './dto/update-site-visit.dto';
-import { VisitOutcome } from '@prisma/client';
+import { VisitOutcome, Prisma } from '@prisma/client';
 
 @Injectable()
 export class SiteVisitsService {
@@ -29,7 +29,7 @@ export class SiteVisitsService {
     });
     if (!lead) throw new NotFoundException('Lead not found');
 
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const visit = await tx.siteVisit.create({
         data: {
           leadId: dto.leadId,
@@ -56,7 +56,7 @@ export class SiteVisitsService {
     });
     if (!visit) throw new NotFoundException('Site Visit not found');
 
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const updated = await tx.siteVisit.update({
         where: { id },
         data: {

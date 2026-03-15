@@ -25,7 +25,7 @@ export class LeadLookupTool {
             bhkPreference: lead.bhkPreference,
             stage: lead.stage,
             notes: lead.notes,
-            activities: lead.activities.map(a => `${a.type}: ${a.description}`),
+            activities: lead.activities.map((a: { type: string; description: string }) => `${a.type}: ${a.description}`),
           });
         } catch (e: any) {
           return `Error looking up lead: ${e.message}`;

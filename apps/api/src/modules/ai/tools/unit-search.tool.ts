@@ -27,7 +27,7 @@ export class UnitSearchTool {
           });
 
           if (units.length === 0) return 'No available units matching these requirements';
-          return JSON.stringify(units.map(u => ({
+          return JSON.stringify(units.map((u: { unitNumber: string; tower: { name: string; project: { name: string } }; totalPrice: number; floor: number; bhkType: string }) => ({
             unitNumber: u.unitNumber,
             tower: u.tower.name,
             project: u.tower.project.name,

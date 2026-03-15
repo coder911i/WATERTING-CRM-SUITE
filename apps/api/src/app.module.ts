@@ -23,6 +23,7 @@ import { AutomationModule } from './modules/automation/automation.module';
 import { PortalModule } from './modules/portal/portal.module';
 import { AiModule } from './modules/ai/ai.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     PortalModule,
     AiModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
 
