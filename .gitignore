@@ -1,6 +1,6 @@
 # Dependencies
-node_modules
-.pnpm-store
+node_modules/
+.pnpm-store/
 
 # Next.js
 .next/
@@ -10,13 +10,35 @@ out/
 dist/
 *.tsbuildinfo
 
-# Prisma
-.env
-prisma/migrations
+# Turbo
+.turbo/
 
-# Docker
-.docker
+# Build
+build/
 
-# OS
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Environment variables
+.env*
+!.env.example
+
+# OS files
 .DS_Store
 Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Prisma
+# DO NOT ignore migrations, only dev.db or backups
+prisma/migrations/dev.db
+prisma/*.db
+prisma/*.db-journal
+
+# Coverage
+coverage/
