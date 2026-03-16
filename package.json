@@ -8,8 +8,8 @@
   ],
   "scripts": {
     "dev": "turbo dev",
-    "build": "turbo build",
-    "start": "turbo start"
+    "build": "cd apps/api && nest build",
+"start": "node apps/api/dist/main.js"
   },
   "devDependencies": {
     "turbo": "^1.12.0"
