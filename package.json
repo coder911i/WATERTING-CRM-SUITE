@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "turbo dev",
-    "build": "cd apps/api && nest build",
+    "build": "npm install && cd apps/api && npx prisma generate && nest build",
 "start": "node apps/api/dist/main.js"
   },
   "devDependencies": {
