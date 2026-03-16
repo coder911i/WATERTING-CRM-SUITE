@@ -1,11 +1,6 @@
-# railway.toml
-# This file forces Railway to run the correct build sequence (Prisma first) without you clicking anything.
-
 [build]
-builder = "nixpacks"
-
-[build.nixpacks]
-buildCommand = "npx prisma generate && npm run build --workspace=api"
+builder = "NIXPACKS"
+buildCommand = "npm run build --workspace=api"
 
 [deploy]
 startCommand = "cd /app/apps/api && node dist/main.js"
