@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import OpenAI from 'openai';
+import { getOpenAIClient, getModelName } from '../llm.provider';
 import { DISCOVERY_SYSTEM_PROMPT } from '../prompts/lead-discovery.prompt';
 
 @Injectable()
@@ -9,10 +10,7 @@ export class LeadDiscoveryAgent {
   private openai: OpenAI;
 
   constructor(private readonly prisma: PrismaService) {
-    this.openai = new OpenAI({ 
-      apiKey: process.env.NVIDIA_API_KEY || 'placeholder',
-      baseURL: 'https://integrate.api.nvidia.com/v1' 
-    });
+    this.openai = getOpenAIClient();
   }
 
   async runDiscovery(tenantId: string) {
@@ -31,7 +29,7 @@ export class LeadDiscoveryAgent {
 
     try {
       const response = await this.openai.chat.completions.create({
-        model: 'nvidia/llama-3.1-nemotron-70b-instruct',
+        model: getModelName(),
         messages: [
           { role: 'system', content: DISCOVERY_SYSTEM_PROMPT.replace('You are an AI Lead Generation Specialist', 'You are an AI Lead Generation Specialist. Respond ONLY with a valid JSON object.') },
           { role: 'user', content: mockCrawlerResults },

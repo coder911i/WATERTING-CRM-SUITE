@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { ChatOpenAI } from '@langchain/openai';
+import { getLLM } from '../llm.provider';
 import { createAgent } from 'langchain';
 import { DynamicTool } from '@langchain/core/tools';
 import { ANALYTICS_SYSTEM_PROMPT } from '../prompts/analytics.prompt';
@@ -14,12 +14,7 @@ export class AnalyticsAgent {
   async runQuery(tenantId: string, question: string) {
     this.logger.log(`Running analytics query for tenant ${tenantId}`);
 
-    const model = new ChatOpenAI({
-      openAIApiKey: process.env.NVIDIA_API_KEY || 'placeholder',
-      configuration: { baseURL: 'https://integrate.api.nvidia.com/v1' },
-      modelName: 'nvidia/llama-3.1-nemotron-70b-instruct',
-      temperature: 0.2, 
-    });
+    const model = getLLM({ temperature: 0.2 });
 
     const sqlTool = new DynamicTool({
       name: 'execute_sql',

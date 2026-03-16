@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { PineconeService } from '../vector/pinecone.service';
 import { LeadEmbedder } from '../vector/lead-embedder';
 import OpenAI from 'openai';
+import { getOpenAIClient, getModelName } from '../llm.provider';
 import { RECOMMENDATION_SYSTEM_PROMPT } from '../prompts/recommendation.prompt';
 
 @Injectable()
@@ -15,10 +16,7 @@ export class PropertyRecommendationAgent {
     private readonly pinecone: PineconeService,
     private readonly leadEmbedder: LeadEmbedder,
   ) {
-    this.openai = new OpenAI({ 
-      apiKey: process.env.NVIDIA_API_KEY || 'placeholder',
-      baseURL: 'https://integrate.api.nvidia.com/v1' 
-    });
+    this.openai = getOpenAIClient();
   }
 
   async recommendProperties(leadId: string) {
@@ -66,7 +64,7 @@ ${units.map((u: RecommendedUnit, i: number) => `${i+1}. ${u.tower.project.name} 
 `;
 
       const response = await this.openai.chat.completions.create({
-        model: 'nvidia/llama-3.1-nemotron-70b-instruct',
+        model: getModelName(),
         messages: [
           { role: 'system', content: RECOMMENDATION_SYSTEM_PROMPT },
           { role: 'user', content: prompt },

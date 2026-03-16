@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import OpenAI from 'openai';
+import { getOpenAIClient, getModelName } from '../llm.provider';
 import { SCORING_SYSTEM_PROMPT } from '../prompts/scoring.prompt';
 
 @Injectable()
@@ -9,10 +10,7 @@ export class LeadScoringAgent {
   private openai: OpenAI;
 
   constructor(private readonly prisma: PrismaService) {
-    this.openai = new OpenAI({ 
-      apiKey: process.env.NVIDIA_API_KEY || 'placeholder',
-      baseURL: 'https://integrate.api.nvidia.com/v1' 
-    });
+    this.openai = getOpenAIClient();
   }
 
   async scoreLead(leadId: string) {
@@ -41,7 +39,7 @@ Lead Data:
 
     try {
       const response = await this.openai.chat.completions.create({
-        model: 'nvidia/llama-3.1-nemotron-70b-instruct',
+        model: getModelName(),
         messages: [
           { role: 'system', content: SCORING_SYSTEM_PROMPT.replace('You are an AI Sales Agent', 'You are an AI Sales Agent. Respond ONLY in valid JSON format.') },
           { role: 'user', content: prompt },
