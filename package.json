@@ -7,10 +7,14 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "turbo dev",
-    "build": "npm install && cd apps/api && npx prisma generate && nest build",
-"start": "node apps/api/dist/main.js"
-  },
+      "dev": "turbo dev",
+      "build:api": "npm install && cd apps/api && npx prisma generate && nest build",
+      "start:api": "node apps/api/dist/main.js",
+      "build:web": "npm install && cd apps/web && next build",
+      "start:web": "cd apps/web && next start",
+      "build": "turbo build",
+      "start": "turbo start"
+    },
   "devDependencies": {
     "turbo": "^1.12.0"
   },
