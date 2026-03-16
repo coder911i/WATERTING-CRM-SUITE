@@ -3,15 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "nest start",
-    "start:dev": "nest start --watch",
     "postinstall": "prisma generate",
     "build": "prisma generate && nest build",
+    "start": "node dist/main.js",
     "start:prod": "node dist/main.js",
+    "start:dev": "nest start --watch",
     "test": "jest",
-    "test:cov": "jest --coverage",
-    "test:e2e": "jest --config test/jest-e2e.json",
-    "start:migrate": "prisma migrate deploy && node dist/main"
+    "test:cov": "jest --coverage"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

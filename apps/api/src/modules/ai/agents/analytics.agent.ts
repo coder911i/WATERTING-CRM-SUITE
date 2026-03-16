@@ -47,7 +47,7 @@ export class AnalyticsAgent {
     try {
       const response = await agent.invoke({
         messages: [{ role: 'user', content: `[Tenant ID: ${tenantId}] Question: ${question}` }],
-      });
+      } as any);
 
       const lastMessage = response.messages[response.messages.length - 1];
       const answer = typeof lastMessage?.content === 'string' ? lastMessage.content : 'No summary generated';

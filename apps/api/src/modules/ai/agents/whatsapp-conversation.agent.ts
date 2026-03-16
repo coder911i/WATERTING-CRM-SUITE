@@ -73,7 +73,7 @@ export class WhatsappConversationAgent {
     try {
       const response = await agent.invoke({
         messages,
-      });
+      } as any);
 
       const lastMessage = response.messages[response.messages.length - 1];
       const reply = typeof lastMessage?.content === 'string' ? lastMessage.content : 'No response';

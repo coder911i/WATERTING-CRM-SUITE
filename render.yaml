@@ -1,26 +1,19 @@
 services:
   - type: web
     name: waterting-api
-    runtime: node
+    env: node
+    region: oregon
     plan: free
-    buildCommand: "npm run build --workspace=api"
-    startCommand: "node apps/api/dist/main.js"
+    rootDir: apps/api
+    buildCommand: npm install && npx prisma generate && npx nest build
+    startCommand: node dist/main.js
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
         sync: false
       - key: JWT_SECRET
-        value: "waterting_super_secure_production_secret_key_2026"
-      - key: NVIDIA_API_KEY
         sync: false
-      - key: REDIS_HOST
-        sync: false
-      - key: REDIS_PORT
-        sync: false
-      - key: REDIS_PASSWORD
-        sync: false
-      - key: PINECONE_API_KEY
-        sync: false
-      - key: PINECONE_ENVIRONMENT
+      - key: DIRECT_URL
         sync: false
