@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: waterting-api
+    runtime: node
+    plan: free
+    buildCommand: "npm run build --workspace=api"
+    startCommand: "node apps/api/dist/main.js"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        value: "waterting_super_secure_production_secret_key_2026"
+      - key: NVIDIA_API_KEY
+        sync: false
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        sync: false
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: PINECONE_API_KEY
+        sync: false
+      - key: PINECONE_ENVIRONMENT
+        sync: false
