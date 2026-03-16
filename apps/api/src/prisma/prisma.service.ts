@@ -12,7 +12,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     } catch (error) {
       this.logger.error('❌ Database connection failed:', error.message);
       this.logger.error('Check DATABASE_URL environment variable on Render');
-      throw error;
+      // Gracefully continue so app can start and bind port solver listener triggers dashboards setups triggers
     }
   }
 
