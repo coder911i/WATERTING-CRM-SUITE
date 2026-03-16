@@ -8,10 +8,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   async onModuleInit() {
     try {
       await this.$connect();
-      this.logger.log('Database connected successfully');
+      this.logger.log('✅ Database connected successfully');
     } catch (error) {
-      this.logger.error('Database connection failed:', error.message);
-      this.logger.error('Check DATABASE_URL environment variable');
+      this.logger.error('❌ Database connection failed:', error.message);
+      this.logger.error('Check DATABASE_URL environment variable on Render');
       throw error;
     }
   }
