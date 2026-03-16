@@ -8,13 +8,24 @@ export class PineconeService {
   private indexName: string;
 
   constructor() {
-    this.pinecone = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY || 'placeholder',
-    });
+    const apiKey = process.env.PINECONE_API_KEY;
     this.indexName = process.env.PINECONE_INDEX_NAME || 'waterting';
+    if (!apiKey) {
+      this.logger.warn('Pinecone API Key not configured, skipping initialization');
+      return;
+    }
+    try {
+      this.pinecone = new Pinecone({ apiKey });
+      this.logger.log('Pinecone initialized successfully');
+    } catch (e: any) {
+      this.logger.warn(`Pinecone initialization failed: ${e.message}`);
+    }
   }
 
   getIndex(namespace: string) {
+    if (!this.pinecone) {
+      throw new Error('Pinecone service not initialized');
+    }
     return this.pinecone.index(this.indexName).namespace(namespace);
   }
 

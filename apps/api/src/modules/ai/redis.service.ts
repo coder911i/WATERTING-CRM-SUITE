@@ -7,14 +7,23 @@ export class AiRedisService implements OnModuleInit {
   private client!: Redis;
 
   onModuleInit() {
-    const host = process.env.REDIS_HOST || 'localhost';
+    const host = process.env.REDIS_HOST;
     const port = parseInt(process.env.REDIS_PORT || '6379');
-    this.client = new Redis({ host, port });
-    this.logger.log(`Redis initialized for AI memory at ${host}:${port}`);
+    if (!host) {
+      this.logger.warn('Redis not configured, skipping initialization');
+      return;
+    }
+    try {
+      this.client = new Redis({ host, port });
+      this.logger.log(`Redis initialized for AI memory at ${host}:${port}`);
+    } catch (e: any) {
+      this.logger.warn(`Redis connection failed: ${e.message}`);
+    }
   }
 
   async getChatHistory(leadId: string): Promise<any[]> {
     const key = `whatsapp:memory:${leadId}`;
+    if (!this.client) return [];
     try {
       const data = await this.client.get(key);
       return data ? JSON.parse(data) : [];
@@ -26,6 +35,7 @@ export class AiRedisService implements OnModuleInit {
 
   async saveMessage(leadId: string, role: 'user' | 'assistant', content: string) {
     const key = `whatsapp:memory:${leadId}`;
+    if (!this.client) return;
     try {
       const history = await this.getChatHistory(leadId);
       history.push({ role, content });
