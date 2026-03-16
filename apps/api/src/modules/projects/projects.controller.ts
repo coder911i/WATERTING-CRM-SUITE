@@ -22,24 +22,23 @@ export class ProjectsController {
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 25 })
   async findAll(
-    @CurrentUser() user: any,
     @Query('page') page = 1,
     @Query('limit') limit = 25,
   ) {
-    return this.projectsService.findAll(user.tenantId, +page, +limit);
+    return this.projectsService.findAll(+page, +limit);
   }
 
   @Post()
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Create a new project' })
-  async create(@CurrentUser() user: any, @Body() dto: CreateProjectDto) {
-    return this.projectsService.create(user.tenantId, dto);
+  async create(@Body() dto: CreateProjectDto) {
+    return this.projectsService.create(dto);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get project detail with towers' })
-  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.projectsService.findOne(id, user.tenantId);
+  async findOne(@Param('id') id: string) {
+    return this.projectsService.findOne(id);
   }
 
   @Patch(':id')
@@ -48,9 +47,8 @@ export class ProjectsController {
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateProjectDto,
-    @CurrentUser() user: any,
   ) {
-    return this.projectsService.update(id, user.tenantId, dto);
+    return this.projectsService.update(id, dto);
   }
 
   @Post(':id/towers')
@@ -59,8 +57,7 @@ export class ProjectsController {
   async addTower(
     @Param('id') id: string,
     @Body() dto: CreateTowerDto,
-    @CurrentUser() user: any,
   ) {
-    return this.projectsService.addTower(id, user.tenantId, dto);
+    return this.projectsService.addTower(id, dto);
   }
 }

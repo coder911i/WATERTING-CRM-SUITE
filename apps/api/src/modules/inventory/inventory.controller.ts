@@ -18,37 +18,35 @@ export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
   @Get()
-  @ApiOperation({ summary: 'List units with filters' })
+  @ApiOperation({ summary: 'List inventory with filters' })
   @ApiQuery({ name: 'projectId', required: false })
   @ApiQuery({ name: 'towerId', required: false })
-  @ApiQuery({ name: 'status', enum: UnitStatus, required: false })
+  @ApiQuery({ name: 'status', required: false, enum: UnitStatus })
   @ApiQuery({ name: 'bhk', required: false })
   async findAll(
-    @CurrentUser() user: any,
     @Query('projectId') projectId?: string,
     @Query('towerId') towerId?: string,
     @Query('status') status?: UnitStatus,
     @Query('bhk') bhk?: string,
   ) {
-    return this.inventoryService.findAll(user.tenantId, { projectId, towerId, status, bhk });
+    return this.inventoryService.findAll({ projectId, towerId, status, bhk });
   }
 
   @Post()
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Create a new unit' })
-  async create(@CurrentUser() user: any, @Body() dto: CreateUnitDto) {
-    return this.inventoryService.create(user.tenantId, dto);
+  @ApiOperation({ summary: 'Add unit manually' })
+  async create(@Body() dto: CreateUnitDto) {
+    return this.inventoryService.create(dto);
   }
 
   @Patch(':id')
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Update unit details or status' })
+  @ApiOperation({ summary: 'Update unit details' })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateUnitDto,
-    @CurrentUser() user: any,
   ) {
-    return this.inventoryService.update(id, user.tenantId, dto);
+    return this.inventoryService.update(id, dto);
   }
 
   @Post(':id/reserve')
@@ -57,15 +55,27 @@ export class InventoryController {
   async reserve(
     @Param('id') id: string,
     @Body() dto: ReserveUnitDto,
-    @CurrentUser() user: any,
   ) {
-    return this.inventoryService.reserve(id, user.tenantId, dto);
+    return this.inventoryService.reserve(id, dto);
   }
 
   @Post(':id/unreserve')
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Release unit reservation' })
-  async unreserve(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.inventoryService.unreserve(id, user.tenantId);
+  @ApiOperation({ summary: 'Remove reservation' })
+  async unreserve(
+    @Param('id') id: string,
+  ) {
+    return this.inventoryService.unreserve(id);
+  }
+
+  @Patch('bulk/price')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Bulk update unit prices' })
+  async bulkUpdatePrice(
+    @Body('towerId') towerId: string,
+    @Body('floor') floor: number,
+    @Body('basePrice') basePrice: number,
+  ) {
+    return this.inventoryService.bulkUpdatePrice({ towerId, floor }, basePrice);
   }
 }

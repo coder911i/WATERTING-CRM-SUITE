@@ -9,11 +9,11 @@ import { UnitStatus } from '@prisma/client';
 export class InventoryService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(tenantId: string, filters: { projectId?: string; towerId?: string; status?: UnitStatus; bhk?: string }) {
+  async findAll(filters: { projectId?: string; towerId?: string; status?: UnitStatus; bhk?: string }) {
     return this.prisma.unit.findMany({
       where: {
         tower: {
-          project: filters.projectId ? { id: filters.projectId, tenantId } : { tenantId },
+          project: filters.projectId ? { id: filters.projectId } : undefined,
           id: filters.towerId ? filters.towerId : undefined,
         },
         status: filters.status ? filters.status : undefined,
@@ -23,20 +23,20 @@ export class InventoryService {
     });
   }
 
-  async create(tenantId: string, dto: CreateUnitDto) {
+  async create(dto: CreateUnitDto) {
     const tower = await this.prisma.tower.findFirst({
-      where: { id: dto.towerId, project: { tenantId } },
+      where: { id: dto.towerId },
     });
     if (!tower) throw new NotFoundException('Tower not found or unauthorized');
 
     return this.prisma.unit.create({
-      data: { ...dto, tenantId },
+      data: dto,
     });
   }
 
-  async update(id: string, tenantId: string, dto: UpdateUnitDto) {
+  async update(id: string, dto: UpdateUnitDto) {
     const unit = await this.prisma.unit.findFirst({
-      where: { id, tower: { project: { tenantId } } },
+      where: { id },
     });
     if (!unit) throw new NotFoundException('Unit not found');
 
@@ -46,9 +46,9 @@ export class InventoryService {
     });
   }
 
-  async reserve(id: string, tenantId: string, dto: ReserveUnitDto) {
+  async reserve(id: string, dto: ReserveUnitDto) {
     const unit = await this.prisma.unit.findFirst({
-      where: { id, tower: { project: { tenantId } } },
+      where: { id },
     });
     if (!unit) throw new NotFoundException('Unit not found');
     if (unit.status !== UnitStatus.AVAILABLE) {
@@ -65,9 +65,9 @@ export class InventoryService {
     });
   }
 
-  async unreserve(id: string, tenantId: string) {
+  async unreserve(id: string) {
     const unit = await this.prisma.unit.findFirst({
-      where: { id, tower: { project: { tenantId } } },
+      where: { id },
     });
     if (!unit) throw new NotFoundException('Unit not found');
 
@@ -77,6 +77,18 @@ export class InventoryService {
         status: UnitStatus.AVAILABLE,
         reservedForLeadId: null,
         reservedUntil: null,
+      },
+    });
+  }
+
+  async bulkUpdatePrice(filters: { towerId?: string; floor?: number }, basePrice: number) {
+    return this.prisma.unit.updateMany({
+      where: {
+        towerId: filters.towerId,
+        floor: filters.floor,
+      },
+      data: {
+        basePrice,
       },
     });
   }

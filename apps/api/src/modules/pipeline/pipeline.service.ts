@@ -6,9 +6,9 @@ import { PipelineStage, Prisma, Lead } from '@prisma/client';
 export class PipelineService {
   constructor(private prisma: PrismaService) {}
 
-  async getKanban(tenantId: string) {
+  async getKanban() {
     const leads = await this.prisma.lead.findMany({
-      where: { tenantId, isActive: true },
+      where: { isActive: true },
       include: { assignedTo: { select: { id: true, name: true } }, project: { select: { id: true, name: true } } },
     });
 
@@ -24,12 +24,11 @@ export class PipelineService {
     }, {} as Record<string, { leads: Lead[]; count: number; totalBudget: number }>);
 
     return kanban;
-
   }
 
-  async moveLead(id: string, tenantId: string, stage: PipelineStage, userId?: string) {
+  async moveLead(id: string, stage: PipelineStage, userId?: string) {
     const lead = await this.prisma.lead.findFirst({
-      where: { id, tenantId, isActive: true },
+      where: { id, isActive: true },
     });
     if (!lead) throw new NotFoundException('Lead not found');
 
@@ -40,7 +39,6 @@ export class PipelineService {
       });
       await tx.activity.create({
         data: {
-          tenantId,
           leadId: id,
           userId,
           type: 'NOTE',

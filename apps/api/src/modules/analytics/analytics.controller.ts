@@ -17,31 +17,31 @@ export class AnalyticsController {
 
   @Get('dashboard')
   @ApiOperation({ summary: 'Get summary counts and inventory stats for dashboard' })
-  async getDashboard(@CurrentUser() user: any) {
-    return this.analyticsService.getDashboard(user.tenantId);
+  async getDashboard() {
+    return this.analyticsService.getDashboard();
   }
 
   @Get('leads-by-status')
   @ApiOperation({ summary: 'Get leads distribution grouping by stage' })
-  async getLeadsByStatus(@CurrentUser() user: any) {
-    return this.analyticsService.getLeadsByStatus(user.tenantId);
+  async getLeadsByStatus() {
+    return this.analyticsService.getLeadsByStatus();
   }
 
   @Get('brokers')
   @ApiOperation({ summary: 'Get broker performance stats' })
-  async getBrokerPerformance(@CurrentUser() user: any) {
-    return this.analyticsService.getBrokerPerformance(user.tenantId);
+  async getBrokerPerformance() {
+    return this.analyticsService.getBrokerPerformance();
   }
 
   @Get('projects')
   @ApiOperation({ summary: 'Get project sales stats' })
-  async getProjectSales(@CurrentUser() user: any) {
-    return this.analyticsService.getProjectSales(user.tenantId);
+  async getProjectSales() {
+    return this.analyticsService.getProjectSales();
   }
 
   @Get('forecast')
   @ApiOperation({ summary: 'Get payment collection forecast for next 30 days' })
-  async getPaymentForecast(@CurrentUser() user: any) {
-    return this.analyticsService.getPaymentForecast(user.tenantId);
+  async getPaymentForecast() {
+    return this.analyticsService.getPaymentForecast();
   }
 }

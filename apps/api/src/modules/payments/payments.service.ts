@@ -7,9 +7,9 @@ import Razorpay from 'razorpay';
 export class PaymentsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createInstallment(bookingId: string, tenantId: string, dto: CreatePaymentDto) {
-    const booking = await this.prisma.booking.findFirst({ where: { id: bookingId, tenantId } });
-    if (!booking) throw new NotFoundException('Booking not found or unauthorized');
+  async createInstallment(bookingId: string, dto: CreatePaymentDto) {
+    const booking = await this.prisma.booking.findFirst({ where: { id: bookingId } });
+    if (!booking) throw new NotFoundException('Booking not found');
 
     return this.prisma.payment.create({
       data: {
@@ -21,11 +21,27 @@ export class PaymentsService {
     });
   }
 
-  async createRazorpayOrder(paymentId: string, tenantId: string) {
-    const payment = await this.prisma.payment.findFirst({ 
-      where: { id: paymentId, booking: { tenantId } } 
+  async recordManualPayment(paymentId: string, dto: { method: PaymentMethod; referenceNumber: string; receiptUrl?: string; paidAt?: Date }) {
+    const payment = await this.prisma.payment.findFirst({ where: { id: paymentId } });
+    if (!payment) throw new NotFoundException('Payment installment not found');
+
+    return this.prisma.payment.update({
+      where: { id: paymentId },
+      data: {
+        status: 'PAID',
+        method: dto.method,
+        referenceNumber: dto.referenceNumber,
+        receiptUrl: dto.receiptUrl,
+        paidAt: dto.paidAt || new Date(),
+      },
     });
-    if (!payment) throw new NotFoundException('Payment installment not found or unauthorized');
+  }
+
+  async createRazorpayOrder(paymentId: string) {
+    const payment = await this.prisma.payment.findFirst({ 
+      where: { id: paymentId } 
+    });
+    if (!payment) throw new NotFoundException('Payment installment not found');
 
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder',
@@ -51,9 +67,9 @@ export class PaymentsService {
     }
   }
 
-  async findAllByBooking(bookingId: string, tenantId: string) {
-    const booking = await this.prisma.booking.findFirst({ where: { id: bookingId, tenantId } });
-    if (!booking) throw new NotFoundException('Booking not found or unauthorized');
+  async findAllByBooking(bookingId: string) {
+    const booking = await this.prisma.booking.findFirst({ where: { id: bookingId } });
+    if (!booking) throw new NotFoundException('Booking not found');
 
     return this.prisma.payment.findMany({ where: { bookingId } });
   }

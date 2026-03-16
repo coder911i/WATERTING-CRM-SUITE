@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { BullModule } from '@nestjs/bull';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -17,6 +18,11 @@ import { AutomationModule } from './modules/automation/automation.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { AiModule } from './modules/ai/ai.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
+import { TenantGuard } from './common/guards/tenant.guard';
+import { RolesGuard } from './common/guards/roles.guard';
+import { TenantInterceptor } from './common/interceptors/tenant.interceptor';
 
 @Module({
   imports: [
@@ -60,7 +66,26 @@ import { AiModule } from './modules/ai/ai.module';
     AutomationModule,
     ActivitiesModule,
     AiModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: TenantGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TenantInterceptor,
+    },
+  ],
 })
 export class AppModule {}

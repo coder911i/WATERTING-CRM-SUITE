@@ -6,23 +6,22 @@ import { UserRole } from '@prisma/client';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(tenantId: string) {
+  async findAll() {
     return this.prisma.user.findMany({
-      where: { tenantId },
       select: { id: true, email: true, name: true, phone: true, role: true, isActive: true, createdAt: true },
     });
   }
 
-  async findOne(id: string, tenantId: string) {
+  async findOne(id: string) {
     const user = await this.prisma.user.findFirst({
-      where: { id, tenantId },
+      where: { id },
     });
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
 
-  async updateRole(id: string, tenantId: string, role: UserRole) {
-    const user = await this.prisma.user.findFirst({ where: { id, tenantId } });
+  async updateRole(id: string, role: UserRole) {
+    const user = await this.prisma.user.findFirst({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
 
     return this.prisma.user.update({
@@ -31,17 +30,14 @@ export class UsersService {
     });
   }
 
-  async create(tenantId: string, data: any) {
+  async create(data: any) {
     return this.prisma.user.create({
-      data: {
-        ...data,
-        tenantId,
-      },
+      data,
     });
   }
 
-  async remove(id: string, tenantId: string) {
-    const user = await this.prisma.user.findFirst({ where: { id, tenantId } });
+  async remove(id: string) {
+    const user = await this.prisma.user.findFirst({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
 
     return this.prisma.user.update({

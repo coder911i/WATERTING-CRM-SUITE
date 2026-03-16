@@ -14,9 +14,9 @@ export class AiService {
     await this.aiQueue.add('score-lead', { leadId }, { delay: 5000 }); // 5s delay layout triggers thresholds
   }
 
-  async triggerBatchScoring(tenantId: string) {
+  async triggerBatchScoring() {
     const leads = await this.prisma.lead.findMany({
-      where: { tenantId, aiScore: null },
+      where: { aiScore: null },
       select: { id: true },
     });
     for (const lead of leads) {

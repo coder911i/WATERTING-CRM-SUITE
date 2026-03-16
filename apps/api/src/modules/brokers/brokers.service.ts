@@ -7,9 +7,9 @@ import * as crypto from 'crypto';
 export class BrokersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(tenantId: string, dto: CreateBrokerDto) {
+  async create(dto: CreateBrokerDto) {
     const existing = await this.prisma.broker.findFirst({
-      where: { phone: dto.phone, tenantId },
+      where: { phone: dto.phone },
     });
     if (existing) throw new ConflictException('Broker with this phone already exists');
 
@@ -17,7 +17,6 @@ export class BrokersService {
 
     return this.prisma.broker.create({
       data: {
-        tenantId,
         name: dto.name,
         phone: dto.phone,
         email: dto.email || null,
@@ -30,14 +29,12 @@ export class BrokersService {
     });
   }
 
-  async registerPublic(tenantId: string, dto: CreateBrokerDto) {
-    // Same as create but explicitly self-assigned
-    return this.create(tenantId, dto);
+  async registerPublic(dto: CreateBrokerDto) {
+    return this.create(dto);
   }
 
-  async findAll(tenantId: string) {
+  async findAll() {
     return this.prisma.broker.findMany({
-      where: { tenantId },
       include: {
         _count: {
           select: { leads: true, commissions: true },
@@ -46,9 +43,9 @@ export class BrokersService {
     });
   }
 
-  async findOne(id: string, tenantId: string) {
+  async findOne(id: string) {
     const broker = await this.prisma.broker.findFirst({
-      where: { id, tenantId },
+      where: { id },
       include: {
         leads: { select: { id: true, name: true, stage: true, createdAt: true } },
         commissions: true,
@@ -58,8 +55,8 @@ export class BrokersService {
     return broker;
   }
 
-  async approve(id: string, tenantId: string) {
-    const broker = await this.prisma.broker.findFirst({ where: { id, tenantId } });
+  async approve(id: string) {
+    const broker = await this.prisma.broker.findFirst({ where: { id } });
     if (!broker) throw new NotFoundException('Broker not found');
 
     return this.prisma.broker.update({
@@ -68,8 +65,8 @@ export class BrokersService {
     });
   }
 
-  async deactivate(id: string, tenantId: string) {
-    const broker = await this.prisma.broker.findFirst({ where: { id, tenantId } });
+  async deactivate(id: string) {
+    const broker = await this.prisma.broker.findFirst({ where: { id } });
     if (!broker) throw new NotFoundException('Broker not found');
 
     return this.prisma.broker.update({

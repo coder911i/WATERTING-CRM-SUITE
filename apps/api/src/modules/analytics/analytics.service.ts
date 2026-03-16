@@ -6,14 +6,12 @@ import { PipelineStage, UnitStatus, Unit, Lead, Broker, Commission, Project, Tow
 export class AnalyticsService {
   constructor(private prisma: PrismaService) {}
 
-  async getDashboard(tenantId: string) {
+  async getDashboard() {
     const [leadsCount, newLeadsCount, visitsCount, units] = await Promise.all([
-      this.prisma.lead.count({ where: { tenantId, isActive: true } }),
-      this.prisma.lead.count({ where: { tenantId, isActive: true, stage: PipelineStage.NEW } }),
-      this.prisma.siteVisit.count({ where: { lead: { tenantId } } }),
-      this.prisma.unit.findMany({
-        where: { tower: { project: { tenantId } } },
-      }),
+      this.prisma.lead.count({ where: { isActive: true } }),
+      this.prisma.lead.count({ where: { isActive: true, stage: PipelineStage.NEW } }),
+      this.prisma.siteVisit.count(),
+      this.prisma.unit.findMany(),
     ]);
 
     const inventory = {
@@ -30,9 +28,9 @@ export class AnalyticsService {
     };
   }
 
-  async getLeadsByStatus(tenantId: string) {
+  async getLeadsByStatus() {
     const leads = await this.prisma.lead.findMany({
-      where: { tenantId, isActive: true },
+      where: { isActive: true },
     });
 
     const stages = Object.values(PipelineStage);
@@ -42,12 +40,10 @@ export class AnalyticsService {
     }, {} as Record<string, number>);
 
     return distribution;
-
   }
 
-  async getBrokerPerformance(tenantId: string) {
+  async getBrokerPerformance() {
     const brokers = await this.prisma.broker.findMany({
-      where: { tenantId },
       include: {
         _count: { select: { leads: true } },
         commissions: true,
@@ -67,9 +63,8 @@ export class AnalyticsService {
     });
   }
 
-  async getProjectSales(tenantId: string) {
+  async getProjectSales() {
     const projects = await this.prisma.project.findMany({
-      where: { tenantId },
       include: {
         towers: {
           include: {
@@ -101,13 +96,12 @@ export class AnalyticsService {
     });
   }
 
-  async getPaymentForecast(tenantId: string) {
+  async getPaymentForecast() {
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
     const pendingPayments = await this.prisma.payment.findMany({
       where: {
-        booking: { tenantId },
         status: 'PENDING',
         dueDate: { lte: thirtyDaysFromNow },
       },

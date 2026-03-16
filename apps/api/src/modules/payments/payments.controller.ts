@@ -15,19 +15,28 @@ export class PaymentsController {
 
   @Post('booking/:bookingId')
   @ApiOperation({ summary: 'Add installment schedule' })
-  async createInstallment(@Param('bookingId') bookingId: string, @CurrentUser() user: any, @Body() dto: CreatePaymentDto) {
-    return this.paymentsService.createInstallment(bookingId, user.tenantId, dto);
+  async createInstallment(@Param('bookingId') bookingId: string, @Body() dto: CreatePaymentDto) {
+    return this.paymentsService.createInstallment(bookingId, dto);
+  }
+
+  @Post(':id/manual')
+  @ApiOperation({ summary: 'Record manual payment (UPI/Cheque/etc)' })
+  async recordManualPayment(
+    @Param('id') id: string,
+    @Body() dto: { method: PaymentMethod; referenceNumber: string; receiptUrl?: string; paidAt?: Date }
+  ) {
+    return this.paymentsService.recordManualPayment(id, dto);
   }
 
   @Post(':id/create-razorpay-order')
   @ApiOperation({ summary: 'Generate Razorpay Order for installment' })
-  async createRazorpayOrder(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.paymentsService.createRazorpayOrder(id, user.tenantId);
+  async createRazorpayOrder(@Param('id') id: string) {
+    return this.paymentsService.createRazorpayOrder(id);
   }
 
   @Get('booking/:bookingId')
   @ApiOperation({ summary: 'List installments for a booking' })
-  async findAllByBooking(@Param('bookingId') bookingId: string, @CurrentUser() user: any) {
-    return this.paymentsService.findAllByBooking(bookingId, user.tenantId);
+  async findAllByBooking(@Param('bookingId') bookingId: string) {
+    return this.paymentsService.findAllByBooking(bookingId);
   }
 }

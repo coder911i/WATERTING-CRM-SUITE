@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ChatOpenAI } from '@langchain/openai';
+import { getLLM } from '../llm.provider';
 import { createAgent } from 'langchain';
 import { LeadLookupTool } from '../tools/lead-lookup.tool';
 import { UnitSearchTool } from '../tools/unit-search.tool';
@@ -33,12 +33,7 @@ export class WhatsappConversationAgent {
     // Load History from Redis thresholds triggers layout
     const history = await this.redis.getChatHistory(leadId);
 
-    const model = new ChatOpenAI({
-      openAIApiKey: process.env.NVIDIA_API_KEY || 'placeholder',
-      configuration: { baseURL: 'https://integrate.api.nvidia.com/v1' },
-      modelName: 'nvidia/llama-3.1-nemotron-70b-instruct',
-      temperature: 0.7,
-    });
+    const model = getLLM({ temperature: 0.7 });
 
     const escalateTool = new DynamicTool({
       name: 'escalate_to_human',

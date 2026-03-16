@@ -22,19 +22,18 @@ export class SiteVisitsController {
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 25 })
   async findAll(
-    @CurrentUser() user: any,
     @Query('leadId') leadId?: string,
     @Query('outcome') outcome?: VisitOutcome,
     @Query('page') page = 1,
     @Query('limit') limit = 25,
   ) {
-    return this.siteVisitsService.findAll(user.tenantId, { leadId, outcome }, +page, +limit);
+    return this.siteVisitsService.findAll({ leadId, outcome }, +page, +limit);
   }
 
   @Post()
   @ApiOperation({ summary: 'Schedule a new site visit' })
   async create(@CurrentUser() user: any, @Body() dto: CreateSiteVisitDto) {
-    return this.siteVisitsService.create(user.tenantId, user.id, dto);
+    return this.siteVisitsService.create(user.id, dto);
   }
 
   @Patch(':id')
@@ -44,7 +43,7 @@ export class SiteVisitsController {
     @Body() dto: UpdateSiteVisitDto,
     @CurrentUser() user: any,
   ) {
-    return this.siteVisitsService.update(id, user.tenantId, user.id, dto);
+    return this.siteVisitsService.update(id, user.id, dto);
   }
 }
 

@@ -20,61 +20,66 @@ export class LeadsController {
 
   @Get()
   @ApiOperation({ summary: 'List leads with filters' })
-  @ApiQuery({ name: 'stage', enum: PipelineStage, required: false })
-  @ApiQuery({ name: 'source', required: false })
+  @ApiQuery({ name: 'stage', required: false, enum: PipelineStage })
   @ApiQuery({ name: 'agentId', required: false })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 25 })
   async findAll(
-    @CurrentUser() user: any,
     @Query('stage') stage?: PipelineStage,
-    @Query('source') source?: any,
     @Query('agentId') agentId?: string,
     @Query('search') search?: string,
     @Query('page') page = 1,
     @Query('limit') limit = 25,
   ) {
-    return this.leadsService.findAll(user.tenantId, { stage, source, agentId, search }, +page, +limit);
+    return this.leadsService.findAll({ stage, agentId, search }, +page, +limit);
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a new lead' })
-  async create(@CurrentUser() user: any, @Body() dto: CreateLeadDto) {
-    return this.leadsService.create(user.tenantId, dto);
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.AGENT)
+  @ApiOperation({ summary: 'Add lead manually' })
+  async create(@Body() dto: CreateLeadDto) {
+    return this.leadsService.create(dto);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get lead profile detail' })
-  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.leadsService.findOne(id, user.tenantId);
+  @ApiOperation({ summary: 'Get lead detail with activities' })
+  async findOne(@Param('id') id: string) {
+    return this.leadsService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update lead details' })
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.AGENT)
+  @ApiOperation({ summary: 'Update lead info' })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateLeadDto,
-    @CurrentUser() user: any,
   ) {
-    return this.leadsService.update(id, user.tenantId, dto);
+    return this.leadsService.update(id, dto);
   }
 
   @Delete(':id')
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Soft delete lead' })
-  async softDelete(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.leadsService.softDelete(id, user.tenantId);
+  async remove(@Param('id') id: string) {
+    return this.leadsService.softDelete(id);
   }
 
-  @Post(':id/stage')
+  @Patch(':id/stage')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.AGENT)
   @ApiOperation({ summary: 'Change lead pipeline stage' })
   async changeStage(
     @Param('id') id: string,
-    @Body() dto: ChangeStageDto,
+    @Body('stage') stage: PipelineStage,
     @CurrentUser() user: any,
   ) {
-    return this.leadsService.changeStage(id, user.tenantId, dto.stage, user.id);
+    return this.leadsService.changeStage(id, stage, user.id);
+  }
+
+  @Get(':id/recommendations')
+  @ApiOperation({ summary: 'Get AI property recommendations for lead' })
+  async getRecommendations(@Param('id') id: string) {
+    return this.leadsService.getRecommendations(id);
   }
 
   @Post(':id/assign')
@@ -83,8 +88,7 @@ export class LeadsController {
   async assign(
     @Param('id') id: string,
     @Body() dto: AssignLeadDto,
-    @CurrentUser() user: any,
   ) {
-    return this.leadsService.assign(id, user.tenantId, dto.agentId);
+    return this.leadsService.assign(id, dto.agentId);
   }
 }

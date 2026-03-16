@@ -14,19 +14,17 @@ export class AutomationController {
 
   @Get()
   @ApiOperation({ summary: 'List all rules' })
-  async findAll(@CurrentUser() user: any) {
+  async findAll() {
     return this.prisma.automation.findMany({
-      where: { tenantId: user.tenantId },
       orderBy: { createdAt: 'desc' },
     });
   }
 
   @Post()
   @ApiOperation({ summary: 'Create automation rule' })
-  async create(@CurrentUser() user: any, @Body() body: any) {
+  async create(@Body() body: any) {
     return this.prisma.automation.create({
       data: {
-        tenantId: user.tenantId,
         name: body.name,
         description: body.description || null,
         trigger: body.trigger,

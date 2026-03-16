@@ -1,41 +1,32 @@
-import { Controller, Post, Body, Get, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { PortalService } from './portal.service';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
-
-class RequestOtpDto {
-  phone!: string;
-  tenantId!: string;
-}
-
-class VerifyOtpDto {
-  phone!: string;
-  otp!: string;
-  tenantId!: string;
-}
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { Public } from '../../common/decorators/public.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @ApiTags('Portal')
 @Controller('portal')
 export class PortalController {
   constructor(private readonly portalService: PortalService) {}
 
+  @Public()
   @Post('request-otp')
   @ApiOperation({ summary: 'Request 6-digit OTP for login' })
-  async requestOtp(@Body() dto: RequestOtpDto) {
+  async requestOtp(@Body() dto: { phone: string; tenantId: string }) {
     return this.portalService.requestOtp(dto.phone, dto.tenantId);
   }
 
+  @Public()
   @Post('verify-otp')
   @ApiOperation({ summary: 'Verify OTP and return token' })
-  async verifyOtp(@Body() dto: VerifyOtpDto) {
+  async verifyOtp(@Body() dto: { phone: string; otp: string; tenantId: string }) {
     return this.portalService.verifyOtp(dto.phone, dto.otp, dto.tenantId);
   }
 
   @Get('dashboard')
-  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get client dashboard details' })
-  async getDashboard(@Body() body: any, @Req() req: any) { // fallback parsing if CurrentUser decorator causes import stress
-    const user = req.user;
+  async getDashboard(@CurrentUser() user: any) {
     if (user.role !== 'CLIENT') {
       throw new UnauthorizedException('Access denied');
     }

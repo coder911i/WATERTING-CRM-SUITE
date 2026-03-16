@@ -13,11 +13,11 @@ export class AutomationService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async triggerEvent(tenantId: string, event: string, context: any) {
-    this.logger.log(`Triggering AI event ${event} for tenant ${tenantId}`);
+  async triggerEvent(event: string, context: any) {
+    this.logger.log(`Triggering AI event ${event}`);
     
     const automations = await this.prisma.automation.findMany({
-      where: { tenantId, isEnabled: true },
+      where: { isEnabled: true },
     });
 
     const matching = automations.filter((aut: Automation) => {

@@ -30,9 +30,8 @@ export class AiController {
 
   @Post('score/batch')
   @ApiOperation({ summary: 'Score all unscored leads for tenant' })
-  async scoreBatch(@Req() req: any) {
-    const tenantId = req.user.tenantId;
-    const result = await this.aiService.triggerBatchScoring(tenantId);
+  async scoreBatch() {
+    const result = await this.aiService.triggerBatchScoring();
     return { message: 'Batch scoring triggered', count: result.count };
   }
 
@@ -58,31 +57,27 @@ export class AiController {
 
   @Post('call/webhook/:callId')
   @ApiOperation({ summary: 'Handle call webhook triggers' })
-  async handleCallWebhook(@Param('callId') callId: string, @Req() req: any) {
-    return this.salesAgent.handleWebhook(callId, req.body);
+  async handleCallWebhook(@Param('callId') callId: string, @Body() body: any) {
+    return this.salesAgent.handleWebhook(callId, body);
   }
 
   @Get('insights')
   @ApiOperation({ summary: 'List periodic AI insights' })
-  async listInsights(@Req() req: any) {
-    const tenantId = req.user.tenantId;
+  async listInsights() {
     return (this.prisma as any).aiInsight.findMany({
-      where: { tenantId },
       orderBy: { createdAt: 'desc' },
     });
   }
 
   @Post('analytics/query')
   @ApiOperation({ summary: 'Ask analytics agent a question' })
-  async queryAnalytics(@Body('question') question: string, @Req() req: any) {
-    const tenantId = req.user.tenantId;
-    return this.analyticsAgent.runQuery(tenantId, question);
+  async queryAnalytics(@Body('question') question: string) {
+    return this.analyticsAgent.runQuery(question);
   }
 
   @Post('discovery/trigger')
   @ApiOperation({ summary: 'Trigger AI lead discovery search' })
-  async triggerDiscovery(@Req() req: any) {
-    const tenantId = req.user.tenantId;
-    return this.discoveryAgent.runDiscovery(tenantId);
+  async triggerDiscovery() {
+    return this.discoveryAgent.runDiscovery();
   }
 }

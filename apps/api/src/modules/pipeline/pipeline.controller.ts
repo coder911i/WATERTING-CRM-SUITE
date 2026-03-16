@@ -15,8 +15,8 @@ export class PipelineController {
 
   @Get()
   @ApiOperation({ summary: 'Get all leads grouped by stage (Kanban)' })
-  async getKanban(@CurrentUser() user: any) {
-    return this.pipelineService.getKanban(user.tenantId);
+  async getKanban() {
+    return this.pipelineService.getKanban();
   }
 
   @Patch(':id/move')
@@ -26,6 +26,6 @@ export class PipelineController {
     @Body() dto: MoveLeadDto,
     @CurrentUser() user: any,
   ) {
-    return this.pipelineService.moveLead(id, user.tenantId, dto.stage, user.id);
+    return this.pipelineService.moveLead(id, dto.stage, user.id);
   }
 }

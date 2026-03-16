@@ -8,11 +8,11 @@ import { VisitOutcome, Prisma } from '@prisma/client';
 export class SiteVisitsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(tenantId: string, filters: { leadId?: string; outcome?: VisitOutcome }, page = 1, limit = 25) {
+  async findAll(filters: { leadId?: string; outcome?: VisitOutcome }, page = 1, limit = 25) {
     const skip = (page - 1) * limit;
     return this.prisma.siteVisit.findMany({
       where: {
-        lead: { tenantId, isActive: true },
+        lead: { isActive: true },
         leadId: filters.leadId ? filters.leadId : undefined,
         outcome: filters.outcome ? filters.outcome : undefined,
       },
@@ -23,16 +23,15 @@ export class SiteVisitsService {
     });
   }
 
-  async create(tenantId: string, userId: string, dto: CreateSiteVisitDto) {
+  async create(userId: string, dto: CreateSiteVisitDto) {
     const lead = await this.prisma.lead.findFirst({
-      where: { id: dto.leadId, tenantId, isActive: true },
+      where: { id: dto.leadId, isActive: true },
     });
     if (!lead) throw new NotFoundException('Lead not found');
 
     return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const visit = await tx.siteVisit.create({
         data: {
-          tenantId,
           leadId: dto.leadId,
           agentId: userId,
           scheduledAt: dto.scheduledAt,
@@ -41,7 +40,6 @@ export class SiteVisitsService {
       });
       await tx.activity.create({
         data: {
-          tenantId,
           leadId: dto.leadId,
           userId,
           type: 'SITE_VISIT',
@@ -52,9 +50,9 @@ export class SiteVisitsService {
     });
   }
 
-  async update(id: string, tenantId: string, userId: string, dto: UpdateSiteVisitDto) {
+  async update(id: string, userId: string, dto: UpdateSiteVisitDto) {
     const visit = await this.prisma.siteVisit.findFirst({
-      where: { id, lead: { tenantId } },
+      where: { id },
     });
     if (!visit) throw new NotFoundException('Site Visit not found');
 
@@ -68,7 +66,6 @@ export class SiteVisitsService {
       });
       await tx.activity.create({
         data: {
-          tenantId,
           leadId: visit.leadId,
           userId,
           type: 'NOTE', 

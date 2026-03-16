@@ -237,6 +237,7 @@ model Payment {
   dueDate           DateTime
   paidAt            DateTime?
   method            PaymentMethod?
+  referenceNumber   String?
   razorpayOrderId   String?
   razorpayPaymentId String?
   receiptUrl        String?
@@ -536,9 +537,11 @@ enum AutomationAction {
 
 enum PaymentMethod {
   ONLINE_RAZORPAY
-  CHEQUE
+  UPI
   NEFT_RTGS
+  CHEQUE
   CASH
+  DD
 }
 
 enum AiAgentType { 

@@ -8,37 +8,36 @@ import { CreateTowerDto } from './dto/create-tower.dto';
 export class ProjectsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(tenantId: string, page = 1, limit = 25) {
+  async findAll(page = 1, limit = 25) {
     const skip = (page - 1) * limit;
     const [items, total] = await Promise.all([
       this.prisma.project.findMany({
-        where: { tenantId },
         skip,
         take: limit,
         include: { _count: { select: { towers: true } } },
       }),
-      this.prisma.project.count({ where: { tenantId } }),
+      this.prisma.project.count(),
     ]);
     return { items, total, page, limit };
   }
 
-  async create(tenantId: string, dto: CreateProjectDto) {
+  async create(dto: CreateProjectDto) {
     return this.prisma.project.create({
-      data: { ...dto, tenantId },
+      data: dto,
     });
   }
 
-  async findOne(id: string, tenantId: string) {
+  async findOne(id: string) {
     const project = await this.prisma.project.findFirst({
-      where: { id, tenantId },
+      where: { id },
       include: { towers: { include: { _count: { select: { units: true } } } } },
     });
     if (!project) throw new NotFoundException('Project not found');
     return project;
   }
 
-  async update(id: string, tenantId: string, dto: UpdateProjectDto) {
-    const project = await this.prisma.project.findFirst({ where: { id, tenantId } });
+  async update(id: string, dto: UpdateProjectDto) {
+    const project = await this.prisma.project.findFirst({ where: { id } });
     if (!project) throw new NotFoundException('Project not found');
 
     return this.prisma.project.update({
@@ -47,12 +46,12 @@ export class ProjectsService {
     });
   }
 
-  async addTower(projectId: string, tenantId: string, dto: CreateTowerDto) {
-    const project = await this.prisma.project.findFirst({ where: { id: projectId, tenantId } });
+  async addTower(projectId: string, dto: CreateTowerDto) {
+    const project = await this.prisma.project.findFirst({ where: { id: projectId } });
     if (!project) throw new NotFoundException('Project not found');
 
     return this.prisma.tower.create({
-      data: { ...dto, projectId, tenantId },
+      data: { ...dto, projectId },
     });
   }
 }

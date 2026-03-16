@@ -17,8 +17,8 @@ export class UsersController {
   @Get()
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'List all users in tenant' })
-  async findAll(@CurrentUser() user: any) {
-    return this.usersService.findAll(user.tenantId);
+  async findAll() {
+    return this.usersService.findAll();
   }
 
   @Patch(':id/role')
@@ -27,8 +27,7 @@ export class UsersController {
   async updateRole(
     @Param('id') id: string,
     @Body('role') role: UserRole,
-    @CurrentUser() user: any,
   ) {
-    return this.usersService.updateRole(id, user.tenantId, role);
+    return this.usersService.updateRole(id, role);
   }
 }

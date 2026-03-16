@@ -17,8 +17,8 @@ export class BrokersController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List all brokers in tenant' })
-  async findAll(@CurrentUser() user: any) {
-    return this.brokersService.findAll(user.tenantId);
+  async findAll() {
+    return this.brokersService.findAll();
   }
 
   @Post()
@@ -26,22 +26,22 @@ export class BrokersController {
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Add broker manually' })
-  async create(@CurrentUser() user: any, @Body() dto: CreateBrokerDto) {
-    return this.brokersService.create(user.tenantId, dto);
+  async create(@Body() dto: CreateBrokerDto) {
+    return this.brokersService.create(dto);
   }
 
   @Post('register')
   @ApiOperation({ summary: 'Public self-registration for brokers' })
-  async registerPublic(@Query('tenantId') tenantId: string, @Body() dto: CreateBrokerDto) {
-    return this.brokersService.registerPublic(tenantId, dto);
+  async registerPublic(@Body() dto: CreateBrokerDto) {
+    return this.brokersService.registerPublic(dto);
   }
 
   @Get(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get broker profile with stats' })
-  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.brokersService.findOne(id, user.tenantId);
+  async findOne(@Param('id') id: string) {
+    return this.brokersService.findOne(id);
   }
 
   @Patch(':id/approve')
@@ -49,8 +49,8 @@ export class BrokersController {
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Approve broker account' })
-  async approve(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.brokersService.approve(id, user.tenantId);
+  async approve(@Param('id') id: string) {
+    return this.brokersService.approve(id);
   }
 
   @Patch(':id/deactivate')
@@ -58,7 +58,7 @@ export class BrokersController {
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Deactivate broker' })
-  async deactivate(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.brokersService.deactivate(id, user.tenantId);
+  async deactivate(@Param('id') id: string) {
+    return this.brokersService.deactivate(id);
   }
 }
