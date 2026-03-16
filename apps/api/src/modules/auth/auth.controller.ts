@@ -1,4 +1,5 @@
 import { Controller, Post, Body, Get, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Public } from '../../common/decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -12,12 +13,14 @@ import { ThrottlerBehindProxyGuard } from '../../common/guards/throttler-behind-
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('register')
   @ApiOperation({ summary: 'Register tenant + admin user' })
   async register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
 
+  @Public()
   @UseGuards(ThrottlerBehindProxyGuard) // Rate limiting applied, throttler guard implementation needed or global
   @Post('login')
   @ApiOperation({ summary: 'Login email + password' })
@@ -25,6 +28,7 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @Public()
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh access token' })
   async refresh(@Body('refreshToken') refreshToken: string) {

@@ -30,7 +30,7 @@ export class ProjectsController {
   }
 
   @Post()
-  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Create a new project' })
   async create(@CurrentUser() user: any, @Body() dto: CreateProjectDto) {
     return this.projectsService.create(user.tenantId, dto);
@@ -43,7 +43,7 @@ export class ProjectsController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Update project' })
   async update(
     @Param('id') id: string,
@@ -54,7 +54,7 @@ export class ProjectsController {
   }
 
   @Post(':id/towers')
-  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Add tower to project' })
   async addTower(
     @Param('id') id: string,

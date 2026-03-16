@@ -31,6 +31,7 @@ export class CommissionsService {
 
     return this.prisma.commission.create({
       data: {
+        tenantId: booking.tenantId,
         bookingId: booking.id,
         brokerId: broker.id,
         amount: commissionAmount,

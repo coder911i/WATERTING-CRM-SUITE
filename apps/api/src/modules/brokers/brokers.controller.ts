@@ -23,7 +23,7 @@ export class BrokersController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Add broker manually' })
   async create(@CurrentUser() user: any, @Body() dto: CreateBrokerDto) {
@@ -40,25 +40,25 @@ export class BrokersController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get broker profile with stats' })
-  async findOne(@Param('id') id: string) {
-    return this.brokersService.findOne(id);
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.brokersService.findOne(id, user.tenantId);
   }
 
   @Patch(':id/approve')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRole.TENANT_ADMIN)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Approve broker account' })
-  async approve(@Param('id') id: string) {
-    return this.brokersService.approve(id);
+  async approve(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.brokersService.approve(id, user.tenantId);
   }
 
   @Patch(':id/deactivate')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRole.TENANT_ADMIN)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Deactivate broker' })
-  async deactivate(@Param('id') id: string) {
-    return this.brokersService.deactivate(id);
+  async deactivate(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.brokersService.deactivate(id, user.tenantId);
   }
 }

@@ -13,10 +13,10 @@ export class PortalService {
     private readonly whatsapp: WhatsappService,
   ) {}
 
-  async requestOtp(phone: string) {
+  async requestOtp(phone: string, tenantId: string) {
     const formattedPhone = phone.replace('+', '').trim();
     const lead = await this.prisma.lead.findFirst({
-      where: { phone: { contains: formattedPhone } },
+      where: { phone: { contains: formattedPhone }, tenantId },
     });
 
     if (!lead) throw new NotFoundException('Lead not found with this number');
@@ -25,7 +25,7 @@ export class PortalService {
     const expires = new Date();
     expires.setMinutes(expires.getMinutes() + 10); // 10 min
 
-    this.otpMap.set(formattedPhone, { otp, expires });
+    this.otpMap.set(`${tenantId}:${formattedPhone}`, { otp, expires });
 
     try {
       await this.whatsapp.sendTemplateMessage(lead.id, 'CLIENT_PORTAL_OTP', { otp });
@@ -37,14 +37,14 @@ export class PortalService {
     return { success: true, message: 'OTP sent successfully', sandboxOtp: otp };
   }
 
-  async verifyOtp(phone: string, otp: string) {
+  async verifyOtp(phone: string, otp: string, tenantId: string) {
     const formattedPhone = phone.replace('+', '').trim();
-    const record = this.otpMap.get(formattedPhone);
+    const record = this.otpMap.get(`${tenantId}:${formattedPhone}`);
 
     if (!record) throw new UnauthorizedException('No OTP requested');
 
     if (new Date() > record.expires) {
-      this.otpMap.delete(formattedPhone);
+      this.otpMap.delete(`${tenantId}:${formattedPhone}`);
       throw new UnauthorizedException('OTP expired');
     }
 
@@ -52,10 +52,10 @@ export class PortalService {
       throw new UnauthorizedException('Invalid OTP');
     }
 
-    this.otpMap.delete(formattedPhone);
+    this.otpMap.delete(`${tenantId}:${formattedPhone}`);
 
     const lead = await this.prisma.lead.findFirst({
-      where: { phone: { contains: formattedPhone } },
+      where: { phone: { contains: formattedPhone }, tenantId },
     });
 
     const payload = { sub: lead!.id, tenantId: lead!.tenantId, role: 'CLIENT' };

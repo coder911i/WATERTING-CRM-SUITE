@@ -56,6 +56,14 @@ describe('AuthService', () => {
 
       await expect(service.register(dto)).rejects.toThrow(ConflictException);
     });
+
+    it('should throw ConflictException if email exists', async () => {
+      prisma.tenant.findUnique.mockResolvedValue(null);
+      prisma.user.findFirst.mockResolvedValue({ id: '1' });
+      const dto = { tenantName: 'New Tenant', slug: 'new', email: 'test@test.com', password: 'password', name: 'John' };
+
+      await expect(service.register(dto)).rejects.toThrow(ConflictException);
+    });
   });
 
   describe('login', () => {
@@ -64,13 +72,33 @@ describe('AuthService', () => {
       await expect(service.login({ email: 'test@test.com', password: 'password' })).rejects.toThrow(UnauthorizedException);
     });
 
+    it('should throw UnauthorizedException if wrong password', async () => {
+      prisma.user.findFirst.mockResolvedValue({ id: '1', passwordHash: 'hashed' });
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      await expect(service.login({ email: 'test@test.com', password: 'password' })).rejects.toThrow(UnauthorizedException);
+    });
+
     it('should return tokens on valid password', async () => {
-      const user = { id: '1', email: 'test@test.com', passwordHash: 'hashed', name: 'John', role: UserRole.SALES_AGENT, isActive: true };
+      const user = { id: '1', email: 'test@test.com', passwordHash: 'hashed', name: 'John', role: UserRole.ADMIN, isActive: true };
       prisma.user.findFirst.mockResolvedValue(user);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       const result = await service.login({ email: 'test@test.com', password: 'password' });
       expect(result).toEqual({ accessToken: 'mock-token', refreshToken: 'mock-token' });
+    });
+  });
+
+  describe('validateToken', () => {
+    it('should verify and return payload on valid token', async () => {
+      const result = await service.validateToken('valid-token');
+      expect(result).toEqual({ sub: '123', email: 'test@test.com' });
+    });
+
+    it('should throw UnauthorizedException on expired token', async () => {
+      (jwtService.verify as jest.Mock).mockImplementation(() => { throw new Error('Expired'); });
+
+      await expect(service.validateToken('invalid-token')).rejects.toThrow(UnauthorizedException);
     });
   });
 });

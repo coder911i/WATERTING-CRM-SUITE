@@ -26,6 +26,10 @@ export class WhatsappConversationAgent {
   async handleMessage(leadId: string, text: string) {
     this.logger.log(`Handling WA message for lead ${leadId}`);
 
+    const lead = await this.prisma.lead.findUnique({ where: { id: leadId } });
+    if (!lead) throw new Error('Lead not found');
+    const tenantId = lead.tenantId;
+
     // Load History from Redis thresholds triggers layout
     const history = await this.redis.getChatHistory(leadId);
 
@@ -47,7 +51,7 @@ export class WhatsappConversationAgent {
 
     const tools = [
       this.leadLookup.getTool(),
-      this.unitSearch.getTool(),
+      this.unitSearch.getTool(tenantId),
       this.visitBooking.getTool(),
       this.crmUpdate.getTool(),
       escalateTool,

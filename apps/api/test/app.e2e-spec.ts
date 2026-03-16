@@ -45,7 +45,9 @@ describe('App (e2e)', () => {
       return request(app.getHttpServer())
         .post('/auth/login')
         .send({ email: 'e2e@e2e.com', password: 'password' })
-        .expect(201 || 200); // Depending on Nest version triggers layout thresholds dashboards
+        .expect(res => {
+          if (![200, 201].includes(res.status)) throw new Error(`Expected 200 or 201, got ${res.status}`);
+        });
     });
   });
 

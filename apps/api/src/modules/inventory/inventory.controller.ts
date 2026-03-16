@@ -34,14 +34,14 @@ export class InventoryController {
   }
 
   @Post()
-  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Create a new unit' })
   async create(@CurrentUser() user: any, @Body() dto: CreateUnitDto) {
     return this.inventoryService.create(user.tenantId, dto);
   }
 
   @Patch(':id')
-  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Update unit details or status' })
   async update(
     @Param('id') id: string,
@@ -52,7 +52,7 @@ export class InventoryController {
   }
 
   @Post(':id/reserve')
-  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER, UserRole.SALES_AGENT)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.AGENT)
   @ApiOperation({ summary: 'Reserve unit for a lead' })
   async reserve(
     @Param('id') id: string,
@@ -63,7 +63,7 @@ export class InventoryController {
   }
 
   @Post(':id/unreserve')
-  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Release unit reservation' })
   async unreserve(@Param('id') id: string, @CurrentUser() user: any) {
     return this.inventoryService.unreserve(id, user.tenantId);

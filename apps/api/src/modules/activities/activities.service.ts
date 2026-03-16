@@ -27,6 +27,7 @@ export class ActivitiesService {
 
     return this.prisma.activity.create({
       data: {
+        tenantId,
         leadId,
         userId,
         type: dto.type,

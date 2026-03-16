@@ -40,6 +40,7 @@ export class FacebookProcessor {
         this.logger.log(`Duplicate Facebook lead found for ${phone}, logging activity.`);
         await this.prisma.activity.create({
           data: {
+            tenantId,
             leadId: lead.id,
             type: 'NOTE',
             description: `Duplicate Facebook Lead submission logged`,
@@ -56,8 +57,8 @@ export class FacebookProcessor {
           phone: formattedPhone,
           email: email || null,
           source: 'FACEBOOK',
-          stage: 'NEW_LEAD',
-          priority: 'NORMAL',
+          stage: 'NEW',
+          priority: 'MEDIUM',
         },
       });
 

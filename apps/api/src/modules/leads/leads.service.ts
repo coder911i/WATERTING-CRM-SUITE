@@ -16,7 +16,7 @@ export class LeadsService {
 
   async findAll(tenantId: string, filters: { stage?: PipelineStage; source?: any; agentId?: string; search?: string }, page = 1, limit = 25) {
     const skip = (page - 1) * limit;
-    return this.prisma.lead.findMany({
+    const items = await this.prisma.lead.findMany({
       where: {
         tenantId,
         isActive: true,
@@ -32,6 +32,8 @@ export class LeadsService {
       take: limit,
       include: { assignedTo: true, project: true },
     });
+    const total = await this.prisma.lead.count({ where: { tenantId, isActive: true }});
+    return { items, total, page, limit };
   }
 
   async create(tenantId: string, dto: CreateLeadDto) {
@@ -79,6 +81,9 @@ export class LeadsService {
   }
 
   async changeStage(id: string, tenantId: string, stage: PipelineStage, userId?: string) {
+    const existingLead = await this.prisma.lead.findFirst({ where: { id, tenantId, isActive: true } });
+    if (!existingLead) throw new NotFoundException('Lead not found');
+
     const lead = await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const updatedLead = await tx.lead.update({
         where: { id },
@@ -86,9 +91,10 @@ export class LeadsService {
       });
       await tx.activity.create({
         data: {
+          tenantId,
           leadId: id,
           userId,
-          type: 'STAGE_CHANGE',
+          type: 'NOTE',
           description: `Stage changed to ${stage}`,
         },
       });

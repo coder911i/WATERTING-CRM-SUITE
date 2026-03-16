@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { PipelineStage, UnitStatus } from '@prisma/client';
+import { PipelineStage, UnitStatus, Unit, Lead, Broker, Commission, Project, Tower, Booking } from '@prisma/client';
 
 @Injectable()
 export class AnalyticsService {
@@ -9,18 +9,17 @@ export class AnalyticsService {
   async getDashboard(tenantId: string) {
     const [leadsCount, newLeadsCount, visitsCount, units] = await Promise.all([
       this.prisma.lead.count({ where: { tenantId, isActive: true } }),
-      this.prisma.lead.count({ where: { tenantId, isActive: true, stage: PipelineStage.NEW_LEAD } }),
+      this.prisma.lead.count({ where: { tenantId, isActive: true, stage: PipelineStage.NEW } }),
       this.prisma.siteVisit.count({ where: { lead: { tenantId } } }),
       this.prisma.unit.findMany({
         where: { tower: { project: { tenantId } } },
-        select: { status: true },
       }),
     ]);
 
     const inventory = {
-      available: units.filter((u: { status: UnitStatus }) => u.status === UnitStatus.AVAILABLE).length,
-      reserved: units.filter((u: { status: UnitStatus }) => u.status === UnitStatus.RESERVED).length,
-      sold: units.filter((u: { status: UnitStatus }) => u.status === UnitStatus.SOLD || u.status === UnitStatus.BOOKED).length,
+      available: units.filter((u: Unit) => u.status === UnitStatus.AVAILABLE).length,
+      reserved: units.filter((u: Unit) => u.status === UnitStatus.RESERVED).length,
+      sold: units.filter((u: Unit) => u.status === UnitStatus.SOLD || u.status === UnitStatus.BOOKED).length,
     };
 
     return {
@@ -34,14 +33,13 @@ export class AnalyticsService {
   async getLeadsByStatus(tenantId: string) {
     const leads = await this.prisma.lead.findMany({
       where: { tenantId, isActive: true },
-      select: { stage: true },
     });
 
     const stages = Object.values(PipelineStage);
-    const distribution = stages.reduce<Record<PipelineStage, number>>((acc, stage) => {
-      acc[stage] = leads.filter((l: { stage: PipelineStage }) => l.stage === stage).length;
+    const distribution = stages.reduce<Record<string, number>>((acc: Record<string, number>, stage: PipelineStage) => {
+      acc[stage] = leads.filter((l: Lead) => l.stage === stage).length;
       return acc;
-    }, {} as Record<PipelineStage, number>);
+    }, {} as Record<string, number>);
 
     return distribution;
 
@@ -52,13 +50,13 @@ export class AnalyticsService {
       where: { tenantId },
       include: {
         _count: { select: { leads: true } },
-        commissions: { select: { amount: true, status: true } },
+        commissions: true,
       },
     });
 
-    return brokers.map(b => {
-      const totalCommission = b.commissions.reduce((sum: number, c: { amount: number; status: string }) => sum + c.amount, 0);
-      const paidCommission = b.commissions.filter((c: { amount: number; status: string }) => c.status === 'PAID').reduce((sum: number, c: { amount: number; status: string }) => sum + c.amount, 0);
+    return brokers.map((b: Broker & { _count: { leads: number }, commissions: Commission[] }) => {
+      const totalCommission = b.commissions.reduce((sum: number, c: Commission) => sum + c.amount, 0);
+      const paidCommission = b.commissions.filter((c: Commission) => c.status === 'PAID').reduce((sum: number, c: Commission) => sum + c.amount, 0);
       return {
         id: b.id,
         name: b.name,
@@ -83,7 +81,7 @@ export class AnalyticsService {
       }
     });
 
-    return projects.map(p => {
+    return projects.map((p: Project & { towers: (Tower & { units: (Unit & { booking: Booking | null })[] })[] }) => {
       let totalSales = 0;
       let bookingsCount = 0;
       p.towers.forEach(t => {

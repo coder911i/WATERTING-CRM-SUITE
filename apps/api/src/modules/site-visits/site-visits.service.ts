@@ -32,6 +32,7 @@ export class SiteVisitsService {
     return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const visit = await tx.siteVisit.create({
         data: {
+          tenantId,
           leadId: dto.leadId,
           agentId: userId,
           scheduledAt: dto.scheduledAt,
@@ -40,9 +41,10 @@ export class SiteVisitsService {
       });
       await tx.activity.create({
         data: {
+          tenantId,
           leadId: dto.leadId,
           userId,
-          type: 'VISIT_SCHEDULED',
+          type: 'SITE_VISIT',
           description: `Site visit scheduled for ${dto.scheduledAt.toLocaleString()}`,
         },
       });
@@ -66,6 +68,7 @@ export class SiteVisitsService {
       });
       await tx.activity.create({
         data: {
+          tenantId,
           leadId: visit.leadId,
           userId,
           type: 'NOTE', 

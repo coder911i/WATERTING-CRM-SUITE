@@ -3,6 +3,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { PrismaService } from '../prisma/prisma.service';
 
+import { Automation } from '@prisma/client';
 @Injectable()
 export class AutomationService {
   private readonly logger = new Logger(AutomationService.name);
@@ -19,7 +20,7 @@ export class AutomationService {
       where: { tenantId, isEnabled: true },
     });
 
-    const matching = automations.filter((aut) => {
+    const matching = automations.filter((aut: Automation) => {
       const trigger = aut.trigger as any;
       return trigger?.event === event;
     });

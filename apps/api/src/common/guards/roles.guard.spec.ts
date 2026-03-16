@@ -34,12 +34,12 @@ describe('RolesGuard', () => {
     });
 
     it('should return true if user role matches required', () => {
-      (reflector.getAllAndOverride as jest.Mock).mockReturnValue([UserRole.TENANT_ADMIN]);
+      (reflector.getAllAndOverride as jest.Mock).mockReturnValue([UserRole.ADMIN]);
       const context = {
         getHandler: jest.fn(),
         getClass: jest.fn(),
         switchToHttp: () => ({
-          getRequest: () => ({ user: { role: UserRole.TENANT_ADMIN } })
+          getRequest: () => ({ user: { role: UserRole.ADMIN } })
         })
       } as any;
 
@@ -49,12 +49,12 @@ describe('RolesGuard', () => {
     });
 
     it('should return false if user role does not match', () => {
-      (reflector.getAllAndOverride as jest.Mock).mockReturnValue([UserRole.TENANT_ADMIN]);
+      (reflector.getAllAndOverride as jest.Mock).mockReturnValue([UserRole.ADMIN]);
       const context = {
         getHandler: jest.fn(),
         getClass: jest.fn(),
         switchToHttp: () => ({
-          getRequest: () => ({ user: { role: UserRole.SALES_AGENT } })
+          getRequest: () => ({ user: { role: UserRole.AGENT } })
         })
       } as any;
 

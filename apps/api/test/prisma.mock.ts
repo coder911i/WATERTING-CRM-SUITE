@@ -21,15 +21,17 @@ export const createMockPrismaClient = () => {
     commission: { ...mockModel },
     siteVisit: { ...mockModel },
     automation: { ...mockModel },
+    automationLog: { ...mockModel },
     payment: { ...mockModel },
+    paymentSchedule: { ...mockModel },
     booking: { ...mockModel },
+    clientPortalToken: { ...mockModel },
     whatsappMessage: { ...mockModel },
     aiInteraction: { ...mockModel },
     aiCall: { ...mockModel },
     aiRecommendation: { ...mockModel },
     aiInsight: { ...mockModel },
     $transaction: jest.fn(async (callback: any) => {
-      // Create a copy passing itself as 'tx' triggers layout thresholds dataset
       const txMock = {
         tenant: { ...mockModel },
         user: { ...mockModel },
@@ -42,7 +44,9 @@ export const createMockPrismaClient = () => {
         commission: { ...mockModel },
         siteVisit: { ...mockModel },
         automation: { ...mockModel },
+        automationLog: { ...mockModel },
         payment: { ...mockModel },
+        paymentSchedule: { ...mockModel },
         booking: { ...mockModel },
       };
       return callback(txMock);

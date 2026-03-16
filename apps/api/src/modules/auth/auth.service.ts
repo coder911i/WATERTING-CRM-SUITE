@@ -47,7 +47,7 @@ export class AuthService {
           passwordHash,
           name: dto.name,
           phone: dto.phone,
-          role: UserRole.TENANT_ADMIN,
+          role: UserRole.ADMIN,
         },
       });
 
@@ -93,5 +93,12 @@ export class AuthService {
       accessToken: this.jwtService.sign(payload),
       refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }), // 7 days
     };
+  }
+  async validateToken(token: string) {
+    try {
+      return this.jwtService.verify(token);
+    } catch {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
   }
 }

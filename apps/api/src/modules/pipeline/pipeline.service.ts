@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { PipelineStage, Prisma } from '@prisma/client';
+import { PipelineStage, Prisma, Lead } from '@prisma/client';
 
 @Injectable()
 export class PipelineService {
@@ -13,15 +13,15 @@ export class PipelineService {
     });
 
     const stages = Object.values(PipelineStage);
-    const kanban = stages.reduce<Record<PipelineStage, { leads: any[]; count: number; totalBudget: number }>>((acc, stage) => {
-      const stageLeads = leads.filter((l: { stage: PipelineStage }) => l.stage === stage);
+    const kanban = stages.reduce<Record<string, { leads: Lead[]; count: number; totalBudget: number }>>((acc: Record<string, { leads: Lead[]; count: number; totalBudget: number }>, stage: PipelineStage) => {
+      const stageLeads = leads.filter((l: Lead) => l.stage === stage) as Lead[];
       acc[stage] = {
         leads: stageLeads,
         count: stageLeads.length,
-        totalBudget: stageLeads.reduce((sum: number, l: { budgetMax: number | null }) => sum + (l.budgetMax || 0), 0),
+        totalBudget: stageLeads.reduce((sum: number, l: Lead) => sum + (l.budgetMax || 0), 0),
       };
       return acc;
-    }, {} as Record<PipelineStage, { leads: any[]; count: number; totalBudget: number }>);
+    }, {} as Record<string, { leads: Lead[]; count: number; totalBudget: number }>);
 
     return kanban;
 
@@ -40,9 +40,10 @@ export class PipelineService {
       });
       await tx.activity.create({
         data: {
+          tenantId,
           leadId: id,
           userId,
-          type: 'STAGE_CHANGE',
+          type: 'NOTE',
           description: `Stage moved from ${lead.stage} to ${stage}`,
         },
       });

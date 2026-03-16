@@ -52,7 +52,7 @@ export class ProjectsService {
     if (!project) throw new NotFoundException('Project not found');
 
     return this.prisma.tower.create({
-      data: { ...dto, projectId },
+      data: { ...dto, projectId, tenantId },
     });
   }
 }

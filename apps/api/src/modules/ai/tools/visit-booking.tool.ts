@@ -17,8 +17,12 @@ export class VisitBookingTool {
 
           const scheduledAt = new Date(`${preferredDate}T${preferredTime}:00`);
 
+          const lead = await this.prisma.lead.findUnique({ where: { id: leadId }, select: { tenantId: true } });
+          if (!lead) return 'Lead not found';
+
           const visit = await this.prisma.siteVisit.create({
             data: {
+              tenantId: lead.tenantId,
               leadId,
               scheduledAt,
               notes: 'Booked by AI Assistant',
@@ -27,8 +31,9 @@ export class VisitBookingTool {
 
           await this.prisma.activity.create({
             data: {
+              tenantId: lead.tenantId,
               leadId,
-              type: 'VISIT_SCHEDULED',
+              type: 'SITE_VISIT',
               description: `Site visit booked by AI for ${scheduledAt.toLocaleString()}`,
             },
           });

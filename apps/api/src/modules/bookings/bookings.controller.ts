@@ -27,7 +27,7 @@ export class BookingsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get booking detail' })
-  async findOne(@Param('id') id: string) {
-    return this.bookingsService.findOne(id);
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.bookingsService.findOne(id, user.tenantId);
   }
 }

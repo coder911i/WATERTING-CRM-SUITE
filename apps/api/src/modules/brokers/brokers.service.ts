@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBrokerDto } from './dto/create-broker.dto';
 import * as crypto from 'crypto';
@@ -46,24 +46,32 @@ export class BrokersService {
     });
   }
 
-  async findOne(id: string) {
-    return this.prisma.broker.findUnique({
-      where: { id },
+  async findOne(id: string, tenantId: string) {
+    const broker = await this.prisma.broker.findFirst({
+      where: { id, tenantId },
       include: {
         leads: { select: { id: true, name: true, stage: true, createdAt: true } },
         commissions: true,
       },
     });
+    if (!broker) throw new NotFoundException('Broker not found');
+    return broker;
   }
 
-  async approve(id: string) {
+  async approve(id: string, tenantId: string) {
+    const broker = await this.prisma.broker.findFirst({ where: { id, tenantId } });
+    if (!broker) throw new NotFoundException('Broker not found');
+
     return this.prisma.broker.update({
       where: { id },
       data: { isApproved: true },
     });
   }
 
-  async deactivate(id: string) {
+  async deactivate(id: string, tenantId: string) {
+    const broker = await this.prisma.broker.findFirst({ where: { id, tenantId } });
+    if (!broker) throw new NotFoundException('Broker not found');
+
     return this.prisma.broker.update({
       where: { id },
       data: { isActive: false },

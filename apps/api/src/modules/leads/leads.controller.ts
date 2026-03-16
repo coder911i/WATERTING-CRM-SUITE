@@ -61,7 +61,7 @@ export class LeadsController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Soft delete lead' })
   async softDelete(@Param('id') id: string, @CurrentUser() user: any) {
     return this.leadsService.softDelete(id, user.tenantId);
@@ -78,7 +78,7 @@ export class LeadsController {
   }
 
   @Post(':id/assign')
-  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Assign lead to agent' })
   async assign(
     @Param('id') id: string,

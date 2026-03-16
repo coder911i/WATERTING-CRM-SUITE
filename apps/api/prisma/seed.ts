@@ -32,7 +32,7 @@ async function main() {
       passwordHash,
       name: 'Admin User',
       phone: '+919999999999',
-      role: UserRole.TENANT_ADMIN,
+      role: UserRole.ADMIN,
     },
   });
 
@@ -46,7 +46,7 @@ async function main() {
       passwordHash,
       name: 'Sales Agent 1',
       phone: '+918888888888',
-      role: UserRole.SALES_AGENT,
+      role: UserRole.AGENT,
     },
   });
 
@@ -61,7 +61,7 @@ async function main() {
       city: 'Mumbai',
       state: 'Maharashtra',
       projectType: ProjectType.RESIDENTIAL,
-      status: ProjectStatus.ACTIVE,
+      status: ProjectStatus.PLANNING,
       reraNumber: 'P51900012345',
       possessionDate: new Date('2028-12-31'),
       amenities: ['Gym', 'Swimming Pool', 'Clubhouse', 'Yoga Deck'],
@@ -73,6 +73,7 @@ async function main() {
   // 4. Create Tower
   const tower = await prisma.tower.create({
     data: {
+      tenantId: tenant.id,
       projectId: project.id,
       name: 'Tower A',
       totalFloors: 10,
@@ -86,6 +87,7 @@ async function main() {
       const isEven = u % 2 === 0;
       await prisma.unit.create({
         data: {
+          tenantId: tenant.id,
           towerId: tower.id,
           unitNumber,
           floor,
@@ -116,8 +118,8 @@ async function main() {
       budgetMax: 12000000,
       bhkPreference: ['2 BHK'],
       source: LeadSource.WEBSITE,
-      stage: PipelineStage.NEW_LEAD,
-      priority: Priority.NORMAL,
+      stage: PipelineStage.NEW,
+      priority: Priority.MEDIUM,
       notes: 'Interested in mid-floor units.',
     },
   });
@@ -144,6 +146,7 @@ async function main() {
   // 7. Create Site Visit
   await prisma.siteVisit.create({
     data: {
+      tenantId: tenant.id,
       leadId: lead2.id,
       agentId: admin.id,
       scheduledAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
@@ -154,6 +157,7 @@ async function main() {
   // 8. Create Activity
   await prisma.activity.create({
     data: {
+      tenantId: tenant.id,
       leadId: lead1.id,
       userId: agent.id,
       type: 'CALL',

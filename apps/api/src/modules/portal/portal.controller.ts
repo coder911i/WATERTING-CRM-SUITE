@@ -5,11 +5,13 @@ import { AuthGuard } from '@nestjs/passport';
 
 class RequestOtpDto {
   phone!: string;
+  tenantId!: string;
 }
 
 class VerifyOtpDto {
   phone!: string;
   otp!: string;
+  tenantId!: string;
 }
 
 @ApiTags('Portal')
@@ -20,13 +22,13 @@ export class PortalController {
   @Post('request-otp')
   @ApiOperation({ summary: 'Request 6-digit OTP for login' })
   async requestOtp(@Body() dto: RequestOtpDto) {
-    return this.portalService.requestOtp(dto.phone);
+    return this.portalService.requestOtp(dto.phone, dto.tenantId);
   }
 
   @Post('verify-otp')
   @ApiOperation({ summary: 'Verify OTP and return token' })
   async verifyOtp(@Body() dto: VerifyOtpDto) {
-    return this.portalService.verifyOtp(dto.phone, dto.otp);
+    return this.portalService.verifyOtp(dto.phone, dto.otp, dto.tenantId);
   }
 
   @Get('dashboard')

@@ -6,7 +6,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class UnitSearchTool {
   constructor(private readonly prisma: PrismaService) {}
 
-  getTool() {
+  getTool(tenantId: string) {
     return new DynamicTool({
       name: 'unit_search',
       description: 'Search for available units matching criteria. Input must be a valid JSON string containing some or all properties: { "budget": number, "bhkType": "1BHK"|"2BHK"|"3BHK", "projectId": "string" }',
@@ -17,6 +17,7 @@ export class UnitSearchTool {
 
           const units = await this.prisma.unit.findMany({
             where: {
+              tenantId,
               status: 'AVAILABLE',
               bhkType: bhkType ? { contains: bhkType.toUpperCase() } : undefined,
               totalPrice: budget ? { lte: budget + 1000000, gte: budget - 1000000 } : undefined,

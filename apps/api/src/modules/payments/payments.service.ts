@@ -7,7 +7,10 @@ import Razorpay from 'razorpay';
 export class PaymentsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createInstallment(bookingId: string, dto: CreatePaymentDto) {
+  async createInstallment(bookingId: string, tenantId: string, dto: CreatePaymentDto) {
+    const booking = await this.prisma.booking.findFirst({ where: { id: bookingId, tenantId } });
+    if (!booking) throw new NotFoundException('Booking not found or unauthorized');
+
     return this.prisma.payment.create({
       data: {
         bookingId,
@@ -18,9 +21,11 @@ export class PaymentsService {
     });
   }
 
-  async createRazorpayOrder(paymentId: string) {
-    const payment = await this.prisma.payment.findUnique({ where: { id: paymentId } });
-    if (!payment) throw new NotFoundException('Payment installment not found');
+  async createRazorpayOrder(paymentId: string, tenantId: string) {
+    const payment = await this.prisma.payment.findFirst({ 
+      where: { id: paymentId, booking: { tenantId } } 
+    });
+    if (!payment) throw new NotFoundException('Payment installment not found or unauthorized');
 
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder',
@@ -46,7 +51,10 @@ export class PaymentsService {
     }
   }
 
-  async findAllByBooking(bookingId: string) {
+  async findAllByBooking(bookingId: string, tenantId: string) {
+    const booking = await this.prisma.booking.findFirst({ where: { id: bookingId, tenantId } });
+    if (!booking) throw new NotFoundException('Booking not found or unauthorized');
+
     return this.prisma.payment.findMany({ where: { bookingId } });
   }
 }

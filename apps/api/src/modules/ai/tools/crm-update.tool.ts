@@ -18,6 +18,9 @@ export class CrmUpdateTool {
           const allowedFields = ['budgetMin', 'budgetMax', 'notes'];
           if (!allowedFields.includes(field)) return `Field ${field} is not editable via AI`;
 
+          const lead = await this.prisma.lead.findUnique({ where: { id: leadId }, select: { tenantId: true } });
+          if (!lead) return 'Lead not found';
+
           await this.prisma.lead.update({
             where: { id: leadId },
             data: { [field]: value },
@@ -25,8 +28,9 @@ export class CrmUpdateTool {
 
           await this.prisma.activity.create({
             data: {
+              tenantId: lead.tenantId,
               leadId,
-              type: 'SYSTEM',
+              type: 'NOTE',
               description: `AI updated field ${field} to ${value}`,
             },
           });

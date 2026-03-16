@@ -10,7 +10,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 @ApiTags('Analytics')
 @Controller('analytics')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
-@Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
+@Roles(UserRole.ADMIN, UserRole.MANAGER)
 @ApiBearerAuth()
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}

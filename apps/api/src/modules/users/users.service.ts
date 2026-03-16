@@ -30,4 +30,23 @@ export class UsersService {
       data: { role },
     });
   }
+
+  async create(tenantId: string, data: any) {
+    return this.prisma.user.create({
+      data: {
+        ...data,
+        tenantId,
+      },
+    });
+  }
+
+  async remove(id: string, tenantId: string) {
+    const user = await this.prisma.user.findFirst({ where: { id, tenantId } });
+    if (!user) throw new NotFoundException('User not found');
+
+    return this.prisma.user.update({
+      where: { id },
+      data: { isActive: false },
+    });
+  }
 }

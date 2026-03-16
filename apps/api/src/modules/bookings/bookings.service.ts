@@ -13,8 +13,11 @@ export class BookingsService {
   ) {}
 
   async create(tenantId: string, dto: CreateBookingDto) {
-    const unit = await this.prisma.unit.findUnique({ where: { id: dto.unitId } });
-    if (!unit) throw new NotFoundException('Unit not found');
+    const unit = await this.prisma.unit.findFirst({ where: { id: dto.unitId, tenantId } });
+    if (!unit) throw new NotFoundException('Unit not found or belongs to another tenant');
+
+    const lead = await this.prisma.lead.findFirst({ where: { id: dto.leadId, tenantId } });
+    if (!lead) throw new NotFoundException('Lead not found or belongs to another tenant');
 
     if (unit.status !== 'AVAILABLE' && unit.status !== 'RESERVED') {
       throw new BadRequestException('Unit is not available for booking');
@@ -55,6 +58,7 @@ export class BookingsService {
     // Log Activity
     await this.prisma.activity.create({
       data: {
+        tenantId,
         leadId: dto.leadId,
         type: 'NOTE',
         description: `Booking created for Unit ID: ${dto.unitId}`,
@@ -74,10 +78,12 @@ export class BookingsService {
     });
   }
 
-  async findOne(id: string) {
-    return this.prisma.booking.findUnique({
-      where: { id },
+  async findOne(id: string, tenantId: string) {
+    const booking = await this.prisma.booking.findFirst({
+      where: { id, tenantId },
       include: { lead: true, unit: true, payments: true },
     });
+    if (!booking) throw new NotFoundException('Booking not found');
+    return booking;
   }
 }

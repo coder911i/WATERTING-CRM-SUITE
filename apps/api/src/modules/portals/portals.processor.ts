@@ -40,6 +40,7 @@ export class PortalsProcessor {
         this.logger.log(`Duplicate lead found for ${phone}, logging activity.`);
         await this.prisma.activity.create({
           data: {
+            tenantId,
             leadId: lead.id,
             type: 'NOTE',
             description: `Duplicate lead received from ${source.replace('PORTAL_', '')}`,
@@ -56,8 +57,8 @@ export class PortalsProcessor {
           phone: formattedPhone,
           email: email || null,
           source: source as any,
-          stage: 'NEW_LEAD',
-          priority: 'NORMAL',
+          stage: 'NEW',
+          priority: 'MEDIUM',
         },
       });
 
