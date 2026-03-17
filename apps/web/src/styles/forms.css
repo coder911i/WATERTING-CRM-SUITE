@@ -1,0 +1,325 @@
+/* Comprehensive Form Styling */
+
+/* ==================== BASE INPUTS ==================== */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+input[type="time"],
+input[type="search"],
+textarea,
+select {
+  /* Background & Border */
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  
+  /* Padding */
+  padding: 10px 12px !important;
+  
+  /* Font */
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #111827 !important; /* Dark text - CRITICAL FIX */
+  
+  /* Transitions */
+  transition: all 200ms ease-in-out !important;
+  
+  /* Shadows */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Remove default appearance */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* ==================== FOCUS STATES ==================== */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="search"]:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  border-color: #0066CC !important; /* Primary blue */
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1), 
+              0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  background-color: #ffffff !important;
+}
+
+/* ==================== PLACEHOLDER TEXT ==================== */
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important; /* Light gray - VISIBLE */
+  opacity: 1 !important;
+  font-style: normal !important;
+}
+
+/* Firefox placeholder */
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: #9ca3af !important;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+/* ==================== ERROR STATES ==================== */
+input.error,
+textarea.error,
+select.error {
+  border-color: #EF4444 !important; /* Red border */
+  background-color: #fef2f2 !important; /* Light red bg */
+  color: #111827 !important; /* Dark text */
+}
+
+input.error:focus,
+textarea.error:focus,
+select.error:focus {
+  border-color: #EF4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* ==================== SUCCESS STATES ==================== */
+input.success,
+textarea.success,
+select.success {
+  border-color: #10B981 !important; /* Green border */
+  background-color: #f0fdf4 !important; /* Light green bg */
+  color: #111827 !important; /* Dark text */
+}
+
+input.success:focus,
+textarea.success:focus,
+select.success:focus {
+  border-color: #10B981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* ==================== DISABLED STATES ==================== */
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background-color: #f3f4f6 !important; /* Light gray bg */
+  border-color: #e5e7eb !important; /* Lighter border */
+  color: #9ca3af !important; /* Gray text */
+  cursor: not-allowed !allowed !important;
+  opacity: 0.6 !important;
+}
+
+/* ==================== TEXTAREA SPECIFIC ==================== */
+textarea {
+  min-height: 120px !important;
+  resize: vertical !important;
+  font-family: inherit !important;
+}
+
+/* ==================== SELECT DROPDOWN ==================== */
+select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+  background-position: right 12px center !important;
+  background-repeat: no-repeat !important;
+  background-size: 16px 12px !important;
+  padding-right: 36px !important;
+  color: #111827 !important;
+}
+
+select option {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+}
+
+select option:checked {
+  background: linear-gradient(#0066CC, #0066CC) !important;
+  background-color: #0066CC !important;
+}
+
+/* ==================== CHECKBOXES ==================== */
+input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  accent-color: #0066CC !important;
+  background-color: #ffffff !important;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #0066CC !important;
+  border-color: #0066CC !important;
+}
+
+input[type="checkbox"]:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1) !important;
+}
+
+input[type="checkbox"]:disabled {
+  background-color: #f3f4f6 !important;
+  cursor: not-allowed !important;
+}
+
+/* ==================== RADIO BUTTONS ==================== */
+input[type="radio"] {
+  width: 18px !important;
+  height: 18px !important;
+  border: 1px solid #d1d5db !important;
+  cursor: pointer !important;
+  accent-color: #0066CC !important;
+  background-color: #ffffff !important;
+}
+
+input[type="radio"]:checked {
+  border-color: #0066CC !important;
+  background-color: #ffffff !important;
+}
+
+input[type="radio"]:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1) !important;
+}
+
+/* ==================== FORM LABELS ==================== */
+label {
+  display: block !important;
+  margin-bottom: 8px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #374151 !important; /* Dark gray - VISIBLE */
+  line-height: 1.5 !important;
+}
+
+label.required::after {
+  content: " *" !important;
+  color: #EF4444 !important;
+  font-weight: bold !important;
+}
+
+/* ==================== FORM GROUPS ==================== */
+.form-group,
+.form-field {
+  margin-bottom: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.form-group:last-child,
+.form-field:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* ==================== ERROR MESSAGES ==================== */
+.form-error,
+.error-message,
+.text-error,
+[role="alert"] {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-top: 4px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #EF4444 !important;
+  line-height: 1.4 !important;
+}
+
+.form-error::before,
+.error-message::before {
+  content: "⚠" !important;
+  font-size: 14px !important;
+  flex-shrink: 0 !important;
+}
+
+/* ==================== SUCCESS MESSAGES ==================== */
+.form-success,
+.success-message {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-top: 4px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #10B981 !important;
+  line-height: 1.4 !important;
+}
+
+.form-success::before,
+.success-message::before {
+  content: "✓" !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  flex-shrink: 0 !important;
+}
+
+/* ==================== HELPER TEXT ==================== */
+.form-hint,
+.hint-text,
+.help-text {
+  margin-top: 4px !important;
+  font-size: 12px !important;
+  color: #6b7280 !important;
+  line-height: 1.4 !important;
+}
+
+/* ==================== FORM LAYOUT ==================== */
+.form-grid {
+  display: grid !important;
+  gap: 20px !important;
+}
+
+.form-grid-2 {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 20px !important;
+}
+
+@media (max-width: 768px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.form-row {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 16px !important;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ==================== FORM ACTIONS ==================== */
+.form-actions {
+  display: flex !important;
+  gap: 12px !important;
+  margin-top: 24px !important;
+  justify-content: flex-end !important;
+}
+
+@media (max-width: 640px) {
+  .form-actions {
+    flex-direction: column-reverse !important;
+  }
+  
+  .form-actions button {
+    width: 100% !important;
+  }
+}

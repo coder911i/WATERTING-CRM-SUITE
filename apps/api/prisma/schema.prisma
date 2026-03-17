@@ -8,42 +8,38 @@ datasource db {
 }
 
 model Tenant {
-  id        String       @id @default(cuid())
-  name      String
-  slug      String       @unique
-  plan      Plan         @default(STARTER)
-  status    TenantStatus @default(ACTIVE)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  users       User[]
-  projects    Project[]
-  leads       Lead[]
-  brokers     Broker[]
-  bookings    Booking[]
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  plan        Plan         @default(STARTER)
+  status      TenantStatus @default(ACTIVE)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   automations Automation[]
-  towers      Tower[]
-  units       Unit[]
-  activities  Activity[]
-  siteVisits  SiteVisit[]
-  commissions Commission[]
-  automationLogs AutomationLog[]
+  bookings    Booking[]
+  brokers     Broker[]
+  leads       Lead[]
+  projects    Project[]
+  users       User[]
+  payments    Payment[]
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String      @id @default(cuid())
   tenantId      String
   email         String
   passwordHash  String
   name          String
   phone         String?
   role          UserRole
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  tenant        Tenant    @relation(fields: [tenantId], references: [id])
-  assignedLeads Lead[]    @relation("AssignedAgent")
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
   activities    Activity[]
+  assignedLeads Lead[]      @relation("AssignedAgent")
   siteVisits    SiteVisit[]
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
+
   @@unique([tenantId, email])
   @@index([tenantId])
 }
@@ -56,96 +52,90 @@ model Project {
   city           String?
   state          String?
   projectType    ProjectType
-  status         ProjectStatus @default(PLANNING)
+  status         ProjectStatus @default(ACTIVE)
   reraNumber     String?
   possessionDate DateTime?
   amenities      String[]      @default([])
   images         String[]      @default([])
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  leads          Lead[]
   tenant         Tenant        @relation(fields: [tenantId], references: [id])
   towers         Tower[]
-  leads          Lead[]
+
   @@index([tenantId])
 }
 
 model Tower {
   id          String  @id @default(cuid())
   projectId   String
-  tenantId    String
   name        String
   totalFloors Int
   project     Project @relation(fields: [projectId], references: [id])
-  tenant      Tenant  @relation(fields: [tenantId], references: [id])
   units       Unit[]
-  @@index([tenantId])
 }
 
 model Unit {
-  id               String     @id @default(cuid())
-  towerId          String
-  tenantId         String
-  unitNumber       String
-  floor            Int
-  bhkType          String
-  carpetArea       Float
-  superArea        Float?
-  facing           String?
-  basePrice        Float
-  totalPrice       Float
-  status           UnitStatus @default(AVAILABLE)
-  floorPlanUrl     String?
-  reservedUntil    DateTime?
+  id                String     @id @default(cuid())
+  towerId           String
+  unitNumber        String
+  floor             Int
+  bhkType           String
+  carpetArea        Float
+  superArea         Float?
+  facing            String?
+  basePrice         Float
+  totalPrice        Float
+  status            UnitStatus @default(AVAILABLE)
+  floorPlanUrl      String?
+  reservedUntil     DateTime?
   reservedForLeadId String?
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  tower            Tower      @relation(fields: [towerId], references: [id])
-  tenant           Tenant     @relation(fields: [tenantId], references: [id])
-  booking          Booking?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  booking           Booking?
+  tower             Tower      @relation(fields: [towerId], references: [id])
+
   @@index([towerId, status])
-  @@index([tenantId])
 }
 
 model Lead {
-  id              String        @id @default(cuid())
-  tenantId        String
-  projectId       String?
-  assignedToId    String?
-  name            String
-  phone           String
-  email           String?
-  budgetMin       Float?
-  budgetMax       Float?
-  bhkPreference   String[]      @default([])
-  source          LeadSource
-  sourceName      String?
-  stage           PipelineStage @default(NEW)
-  priority        Priority      @default(MEDIUM)
-  tags            String[]      @default([])
-  notes           String?
-  isActive        Boolean       @default(true)
-  firstContactedAt DateTime?
-  lastActivityAt  DateTime?
-  nextFollowUpAt  DateTime?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  tenant          Tenant        @relation(fields: [tenantId], references: [id])
-  project         Project?      @relation(fields: [projectId], references: [id])
-  assignedTo      User?         @relation("AssignedAgent", fields: [assignedToId], references: [id])
-  activities      Activity[]
-  siteVisits      SiteVisit[]
-  brokerId        String?
-  broker          Broker?       @relation(fields: [brokerId], references: [id])
-  booking         Booking?
-  whatsappOptOut  Boolean       @default(false)
-  
-  // AI Fields thresholds triggers layout managers
-  aiScore           Float?
-  aiScoreLabel      String?
-  aiHandoffRequested Boolean @default(false)
-  aiInteractions    AiInteraction[]
-  aiCalls           AiCall[]
-  aiRecommendations AiRecommendation[]
+  id                 String             @id @default(cuid())
+  tenantId           String
+  projectId          String?
+  assignedToId       String?
+  name               String
+  phone              String
+  email              String?
+  budgetMin          Float?
+  budgetMax          Float?
+  bhkPreference      String[]           @default([])
+  source             LeadSource
+  sourceName         String?
+  stage              PipelineStage      @default(NEW_LEAD)
+  priority           Priority           @default(NORMAL)
+  tags               String[]           @default([])
+  notes              String?
+  isActive           Boolean            @default(true)
+  firstContactedAt   DateTime?
+  lastActivityAt     DateTime?
+  nextFollowUpAt     DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  brokerId           String?
+  whatsappOptOut     Boolean            @default(false)
+  aiScore            Float?
+  aiScoreLabel       String?
+  aiHandoffRequested Boolean            @default(false)
+  activities         Activity[]
+  aiCalls            AiCall[]
+  aiInteractions     AiInteraction[]
+  aiRecommendations  AiRecommendation[]
+  booking            Booking?
+  assignedTo         User?              @relation("AssignedAgent", fields: [assignedToId], references: [id])
+  broker             Broker?            @relation(fields: [brokerId], references: [id])
+  project            Project?           @relation(fields: [projectId], references: [id])
+  tenant             Tenant             @relation(fields: [tenantId], references: [id])
+  siteVisits         SiteVisit[]
 
   @@index([tenantId, stage])
   @@index([tenantId, assignedToId])
@@ -154,7 +144,6 @@ model Lead {
 
 model SiteVisit {
   id              String        @id @default(cuid())
-  tenantId        String
   leadId          String
   agentId         String?
   scheduledAt     DateTime
@@ -166,73 +155,71 @@ model SiteVisit {
   reminder2hSent  Boolean       @default(false)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  tenant          Tenant        @relation(fields: [tenantId], references: [id])
-  lead            Lead          @relation(fields: [leadId], references: [id])
   agent           User?         @relation(fields: [agentId], references: [id])
-  @@index([tenantId])
+  lead            Lead          @relation(fields: [leadId], references: [id])
 }
 
 model Activity {
   id          String       @id @default(cuid())
-  tenantId    String
   leadId      String
   userId      String?
   type        ActivityType
   description String
   metadata    Json         @default("{}")
   createdAt   DateTime     @default(now())
-  tenant      Tenant       @relation(fields: [tenantId], references: [id])
   lead        Lead         @relation(fields: [leadId], references: [id])
   user        User?        @relation(fields: [userId], references: [id])
+
   @@index([leadId])
-  @@index([tenantId])
 }
 
 model Broker {
-  id             String           @id @default(cuid())
-  tenantId       String
-  name           String
-  phone          String
-  email          String?
-  reraNumber     String?
-  firmName       String?
-  referralCode   String           @unique
-  commissionPct  Float            @default(2.0)
-  isActive       Boolean          @default(true)
-  isApproved     Boolean          @default(false)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  tenant         Tenant           @relation(fields: [tenantId], references: [id])
-  leads          Lead[]
-  commissions    Commission[]
+  id            String       @id @default(cuid())
+  tenantId      String
+  name          String
+  phone         String
+  email         String?
+  reraNumber    String?
+  firmName      String?
+  referralCode  String       @unique
+  commissionPct Float        @default(2.0)
+  isActive      Boolean      @default(true)
+  isApproved    Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  tenant        Tenant       @relation(fields: [tenantId], references: [id])
+  commissions   Commission[]
+  leads         Lead[]
+
   @@index([tenantId])
 }
 
 model Booking {
-  id             String        @id @default(cuid())
-  tenantId       String
-  leadId         String        @unique
-  unitId         String        @unique
-  tokenAmount    Float
-  totalAmount    Float
-  bookingDate    DateTime      @default(now())
-  status         BookingStatus @default(CONFIRMED)
-  documents      Json          @default("[]")
-  notes          String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  tenant         Tenant        @relation(fields: [tenantId], references: [id])
-  lead           Lead          @relation(fields: [leadId], references: [id])
-  unit           Unit          @relation(fields: [unitId], references: [id])
-  payments       Payment[]
-  paymentSchedules PaymentSchedule[]
-  commission     Commission?
+  id          String        @id @default(cuid())
+  tenantId    String
+  leadId      String        @unique
+  unitId      String        @unique
+  tokenAmount Float
+  totalAmount Float
+  bookingDate DateTime      @default(now())
+  status      BookingStatus @default(ACTIVE)
+  documents   Json          @default("[]")
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  lead        Lead          @relation(fields: [leadId], references: [id])
+  tenant      Tenant        @relation(fields: [tenantId], references: [id])
+  unit        Unit          @relation(fields: [unitId], references: [id])
+  commission  Commission?
+  payments    Payment[]
+
   @@index([tenantId])
 }
 
 model Payment {
-  id                String        @id @default(cuid())
+  id                String         @id @default(cuid())
   bookingId         String
+  tenantId          String
   amount            Float
   dueDate           DateTime
   paidAt            DateTime?
@@ -241,31 +228,17 @@ model Payment {
   razorpayOrderId   String?
   razorpayPaymentId String?
   receiptUrl        String?
-  status            PaymentStatus @default(PENDING)
-  createdAt         DateTime      @default(now())
-  booking           Booking       @relation(fields: [bookingId], references: [id])
-  @@index([bookingId])
-}
+  status            PaymentStatus  @default(PENDING)
+  createdAt         DateTime       @default(now())
+  booking           Booking        @relation(fields: [bookingId], references: [id])
+  tenant            Tenant         @relation(fields: [tenantId], references: [id])
 
-model PaymentSchedule {
-  id            String        @id @default(cuid())
-  bookingId     String
-  tenantId      String
-  installmentNo Int
-  amount        Float
-  dueDate       DateTime
-  status        PaymentStatus @default(PENDING)
-  notes         String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  booking       Booking       @relation(fields: [bookingId], references: [id])
   @@index([bookingId])
   @@index([tenantId])
 }
 
 model Commission {
   id         String           @id @default(cuid())
-  tenantId   String
   bookingId  String           @unique
   brokerId   String
   amount     Float
@@ -274,64 +247,52 @@ model Commission {
   paidAt     DateTime?
   notes      String?
   createdAt  DateTime         @default(now())
-  tenant     Tenant           @relation(fields: [tenantId], references: [id])
   booking    Booking          @relation(fields: [bookingId], references: [id])
   broker     Broker           @relation(fields: [brokerId], references: [id])
-  @@index([tenantId])
 }
 
 model Automation {
-  id          String    @id @default(cuid())
+  id          String          @id @default(cuid())
   tenantId    String
   name        String
   description String?
-  trigger     AutomationTrigger
-  conditions  Json      @default("[]")
-  actions     AutomationAction[]
-  isEnabled   Boolean   @default(true)
-  runCount    Int       @default(0)
+  trigger     Json
+  conditions  Json            @default("[]")
+  actions     Json
+  isEnabled   Boolean         @default(true)
+  runCount    Int             @default(0)
   lastRunAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  tenant      Tenant          @relation(fields: [tenantId], references: [id])
   logs        AutomationLog[]
+
   @@index([tenantId])
 }
 
 model AutomationLog {
-  id           String    @id @default(cuid())
-  tenantId     String
+  id           String     @id @default(cuid())
   automationId String
   leadId       String?
   status       String
-  output       Json      @default("{}")
-  runAt        DateTime  @default(now())
-  tenant       Tenant    @relation(fields: [tenantId], references: [id])
+  output       Json       @default("{}")
+  runAt        DateTime   @default(now())
   automation   Automation @relation(fields: [automationId], references: [id])
-  @@index([automationId])
-  @@index([tenantId])
-}
 
-model ClientPortalToken {
-  id        String   @id @default(cuid())
-  tenantId  String
-  clientId  String
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  @@index([tenantId, clientId])
+  @@index([automationId])
 }
 
 model WhatsAppMessage {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   tenantId    String
   leadId      String
   direction   String
   message     String
   templateId  String?
-  status      String    @default("SENT")
+  status      String   @default("SENT")
   waMessageId String?
-  sentAt      DateTime  @default(now())
+  sentAt      DateTime @default(now())
+
   @@index([tenantId, leadId])
 }
 
@@ -349,39 +310,42 @@ model AiInteraction {
   escalatedAt  DateTime?
   createdAt    DateTime    @default(now())
   lead         Lead        @relation(fields: [leadId], references: [id])
+
   @@index([tenantId, leadId])
   @@index([agentType])
 }
 
 model AiCall {
-  id             String     @id @default(cuid())
-  tenantId       String
-  leadId         String
-  status         CallStatus
-  duration       Int        @default(0)
-  recordingUrl   String?
-  transcript     String?
-  summary        String?
-  extractedData  Json       @default("{}")
-  visitBooked    Boolean    @default(false)
-  escalatedToId  String?
-  startedAt      DateTime   @default(now())
-  endedAt        DateTime?
-  lead           Lead       @relation(fields: [leadId], references: [id])
+  id            String     @id @default(cuid())
+  tenantId      String
+  leadId        String
+  status        CallStatus
+  duration      Int        @default(0)
+  recordingUrl  String?
+  transcript    String?
+  summary       String?
+  extractedData Json       @default("{}")
+  visitBooked   Boolean    @default(false)
+  escalatedToId String?
+  startedAt     DateTime   @default(now())
+  endedAt       DateTime?
+  lead          Lead       @relation(fields: [leadId], references: [id])
+
   @@index([tenantId, leadId])
 }
 
 model AiRecommendation {
-  id           String   @id @default(cuid())
-  tenantId     String
-  leadId       String
-  unitIds      String[]
-  reasoning    String
-  score        Float[]
-  wasShown     Boolean  @default(false)
-  wasClicked   Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  lead         Lead     @relation(fields: [leadId], references: [id])
+  id         String   @id @default(cuid())
+  tenantId   String
+  leadId     String
+  unitIds    String[]
+  reasoning  String
+  score      Float[]
+  wasShown   Boolean  @default(false)
+  wasClicked Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  lead       Lead     @relation(fields: [leadId], references: [id])
+
   @@index([tenantId, leadId])
 }
 
@@ -394,145 +358,117 @@ model AiInsight {
   data      Json     @default("{}")
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+
   @@index([tenantId])
 }
 
-// ==========================================
-// ENUMS
-// ==========================================
-
-enum Plan { 
-  FREE 
-  STARTER 
-  GROWTH 
-  ENTERPRISE 
+enum Plan {
+  STARTER
+  GROWTH
+  PROFESSIONAL
+  ENTERPRISE
 }
 
-enum TenantStatus { 
-  ACTIVE 
-  SUSPENDED 
-  CANCELLED 
-  TRIAL 
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELLED
 }
 
-enum UserRole { 
-  SUPER_ADMIN 
-  ADMIN 
-  MANAGER 
-  AGENT 
-  CLIENT 
+enum UserRole {
+  TENANT_ADMIN
+  SALES_MANAGER
+  SALES_AGENT
 }
 
-enum ProjectType { 
-  RESIDENTIAL 
-  COMMERCIAL 
-  MIXED_USE 
-  PLOTTED 
-  VILLA 
+enum ProjectType {
+  RESIDENTIAL
+  COMMERCIAL
+  PLOTTED
+  VILLA
 }
 
-enum ProjectStatus { 
-  PLANNING 
-  UNDER_CONSTRUCTION 
-  READY_TO_MOVE 
-  COMPLETED 
+enum ProjectStatus {
+  ACTIVE
+  SOLD_OUT
+  ON_HOLD
+  ARCHIVED
 }
 
-enum UnitStatus { 
-  AVAILABLE 
-  RESERVED 
-  BOOKED 
-  SOLD 
-  BLOCKED 
+enum UnitStatus {
+  AVAILABLE
+  RESERVED
+  BOOKED
+  SOLD
+  BLOCKED
 }
 
-enum LeadSource { 
-  WEBSITE 
-  FACEBOOK 
-  INSTAGRAM 
-  GOOGLE_ADS 
-  PORTAL_99ACRES 
-  PORTAL_MAGICBRICKS 
-  PORTAL_HOUSING 
-  REFERRAL 
-  BROKER 
-  WALK_IN 
-  COLD_CALL 
-  OTHER 
+enum LeadSource {
+  MANUAL
+  WEBSITE
+  FACEBOOK
+  GOOGLE
+  WHATSAPP
+  PORTAL_99ACRES
+  PORTAL_MAGICBRICKS
+  BROKER
 }
 
-enum PipelineStage { 
-  NEW 
-  CONTACTED 
-  INTERESTED 
-  SITE_VISIT_SCHEDULED 
-  SITE_VISIT_DONE 
-  NEGOTIATION 
-  BOOKED 
-  LOST 
+enum PipelineStage {
+  NEW_LEAD
+  CONTACTED
+  INTERESTED
+  VISIT_SCHEDULED
+  VISIT_DONE
+  NEGOTIATION
+  BOOKING_DONE
+  LOST
 }
 
-enum Priority { 
-  LOW 
-  MEDIUM 
-  HIGH 
-  URGENT 
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
 }
 
-enum ActivityType { 
-  CALL 
-  EMAIL 
-  WHATSAPP 
-  SITE_VISIT 
-  NOTE 
-  MEETING 
-  FOLLOW_UP 
+enum ActivityType {
+  CALL
+  WHATSAPP
+  EMAIL
+  NOTE
+  STAGE_CHANGE
+  VISIT_SCHEDULED
+  DOCUMENT_SENT
+  SYSTEM
 }
 
-enum VisitOutcome { 
-  INTERESTED 
-  NOT_INTERESTED 
-  NEEDS_FOLLOWUP 
-  BOOKED 
-  CANCELLED 
+enum VisitOutcome {
+  INTERESTED
+  FOLLOW_UP
+  NOT_INTERESTED
+  NO_SHOW
 }
 
-enum PaymentStatus { 
-  PENDING 
-  PAID 
-  OVERDUE 
-  WAIVED 
+enum PaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+  FAILED
+  REFUNDED
 }
 
-enum BookingStatus { 
-  DRAFT 
-  CONFIRMED 
-  CANCELLED 
+enum BookingStatus {
+  ACTIVE
+  CANCELLED
+  COMPLETED
 }
 
-enum CommissionStatus { 
-  PENDING 
-  APPROVED 
-  PAID 
-  DISPUTED 
-}
-
-enum AutomationTrigger { 
-  LEAD_CREATED 
-  STAGE_CHANGED 
-  SITE_VISIT_SCHEDULED 
-  SITE_VISIT_COMPLETED 
-  BOOKING_CREATED 
-  PAYMENT_DUE 
-}
-
-enum AutomationAction { 
-  SEND_EMAIL 
-  SEND_WHATSAPP 
-  CREATE_ACTIVITY 
-  ASSIGN_AGENT 
-  MOVE_STAGE 
-  SEND_NOTIFICATION 
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  PAID
+  DISPUTED
 }
 
 enum PaymentMethod {
@@ -544,21 +480,21 @@ enum PaymentMethod {
   DD
 }
 
-enum AiAgentType { 
-  SCORING 
-  WHATSAPP_CONVERSATION 
-  CALLING 
-  RECOMMENDATION 
-  ANALYTICS 
-  DISCOVERY 
+enum AiAgentType {
+  SCORING
+  WHATSAPP_CONVERSATION
+  CALLING
+  RECOMMENDATION
+  ANALYTICS
+  DISCOVERY
 }
 
-enum CallStatus { 
-  INITIATED 
-  RINGING 
-  IN_PROGRESS 
-  COMPLETED 
-  FAILED 
-  NO_ANSWER 
-  TRANSFERRED 
+enum CallStatus {
+  INITIATED
+  RINGING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  NO_ANSWER
+  TRANSFERRED
 }
