@@ -1,6 +1,7 @@
 import { IsString, IsNotEmpty, IsOptional, IsEmail, IsNumber, IsArray, IsEnum, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { LeadSource, Priority } from '@prisma/client';
+import { Transform } from 'class-transformer';
 
 export class CreateLeadDto {
   @ApiProperty({ example: 'John Doe' })
@@ -11,6 +12,7 @@ export class CreateLeadDto {
   @ApiProperty({ example: '+919876543210' })
   @IsString()
   @IsNotEmpty()
+  @Transform(({ value }) => typeof value === 'string' ? value.replace(/\s+/g, '') : value)
   @Matches(/^\+?[1-9]\d{1,14}$/, { message: 'Phone number must be in E.164 format' })
   phone!: string;
 

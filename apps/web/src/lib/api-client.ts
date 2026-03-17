@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const baseURL = base.endsWith('/api') ? base : `${base}${base.endsWith('/') ? 'api' : '/api'}`;
+
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },

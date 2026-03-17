@@ -28,8 +28,8 @@ export default function LeadDrawer({ isOpen, onClose, onSuccess }: { isOpen: boo
   const onSubmit = async (data: any) => {
     try {
       await apiClient.post('/leads', {
-
         ...data,
+        phone: data.phone.replace(/\s+/g, ''),
         email: data.email || undefined,
       });
       onSuccess();
