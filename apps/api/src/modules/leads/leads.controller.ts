@@ -36,7 +36,7 @@ export class LeadsController {
   }
 
   @Post()
-  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.AGENT)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER, UserRole.SALES_AGENT)
   @ApiOperation({ summary: 'Add lead manually' })
   async create(@Body() dto: CreateLeadDto) {
     return this.leadsService.create(dto);
@@ -49,7 +49,7 @@ export class LeadsController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.AGENT)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER, UserRole.SALES_AGENT)
   @ApiOperation({ summary: 'Update lead info' })
   async update(
     @Param('id') id: string,
@@ -59,14 +59,14 @@ export class LeadsController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
   @ApiOperation({ summary: 'Soft delete lead' })
   async remove(@Param('id') id: string) {
     return this.leadsService.softDelete(id);
   }
 
   @Patch(':id/stage')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.AGENT)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER, UserRole.SALES_AGENT)
   @ApiOperation({ summary: 'Change lead pipeline stage' })
   async changeStage(
     @Param('id') id: string,
@@ -83,7 +83,7 @@ export class LeadsController {
   }
 
   @Post(':id/assign')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
   @ApiOperation({ summary: 'Assign lead to agent' })
   async assign(
     @Param('id') id: string,

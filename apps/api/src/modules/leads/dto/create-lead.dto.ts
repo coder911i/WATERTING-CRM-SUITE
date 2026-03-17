@@ -45,7 +45,7 @@ export class CreateLeadDto {
   @IsString()
   sourceName?: string;
 
-  @ApiProperty({ enum: Priority, example: Priority.MEDIUM, required: false })
+  @ApiProperty({ enum: Priority, example: Priority.NORMAL, required: false })
   @IsOptional()
   @IsEnum(Priority)
   priority?: Priority;

@@ -33,14 +33,14 @@ export class InventoryController {
   }
 
   @Post()
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
   @ApiOperation({ summary: 'Add unit manually' })
   async create(@Body() dto: CreateUnitDto) {
     return this.inventoryService.create(dto);
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
   @ApiOperation({ summary: 'Update unit details' })
   async update(
     @Param('id') id: string,
@@ -50,7 +50,7 @@ export class InventoryController {
   }
 
   @Post(':id/reserve')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.AGENT)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER, UserRole.SALES_AGENT)
   @ApiOperation({ summary: 'Reserve unit for a lead' })
   async reserve(
     @Param('id') id: string,
@@ -60,7 +60,7 @@ export class InventoryController {
   }
 
   @Post(':id/unreserve')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
   @ApiOperation({ summary: 'Remove reservation' })
   async unreserve(
     @Param('id') id: string,
@@ -69,7 +69,7 @@ export class InventoryController {
   }
 
   @Patch('bulk/price')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
   @ApiOperation({ summary: 'Bulk update unit prices' })
   async bulkUpdatePrice(
     @Body('towerId') towerId: string,

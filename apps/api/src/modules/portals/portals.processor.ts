@@ -57,8 +57,8 @@ export class PortalsProcessor {
           phone: formattedPhone,
           email: email || null,
           source: source as any,
-          stage: 'NEW',
-          priority: 'MEDIUM',
+          stage: 'NEW_LEAD',
+          priority: 'NORMAL',
         },
       });
 

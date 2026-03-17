@@ -4,7 +4,7 @@ import { Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { WhatsappService } from '../whatsapp/whatsapp.service';
 
-import { AutomationAction } from '@prisma/client';
+
 @Processor('automation')
 export class AutomationProcessor {
   private readonly logger = new Logger(AutomationProcessor.name);
@@ -55,7 +55,7 @@ export class AutomationProcessor {
           automationId,
           leadId: context.leadId || context.id || null,
           status: 'SUCCESS',
-          output: { executedActions: actions.map((a: { type: AutomationAction; payload?: any }) => a.type) },
+          output: { executedActions: actions.map((a: { type: string; payload?: any }) => a.type) },
         },
       });
 

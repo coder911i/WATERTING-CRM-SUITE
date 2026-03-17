@@ -33,7 +33,7 @@ export class VisitBookingTool {
             data: {
               tenantId: lead.tenantId,
               leadId,
-              type: 'SITE_VISIT',
+              type: 'VISIT_SCHEDULED',
               description: `Site visit booked by AI for ${scheduledAt.toLocaleString()}`,
             },
           });

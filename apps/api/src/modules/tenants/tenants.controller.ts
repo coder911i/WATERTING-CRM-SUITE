@@ -21,7 +21,7 @@ export class TenantsController {
   }
 
   @Patch()
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.TENANT_ADMIN)
   @ApiOperation({ summary: 'Update tenant details' })
   async update(@Body('name') name: string, @CurrentUser() user: any) {
     return this.tenantsService.update(user.tenantId, { name });

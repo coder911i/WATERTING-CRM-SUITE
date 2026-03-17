@@ -78,6 +78,7 @@ model Tower {
 model Unit {
   id                String     @id @default(cuid())
   towerId           String
+  tenantId          String
   unitNumber        String
   floor             Int
   bhkType           String
@@ -144,6 +145,7 @@ model Lead {
 
 model SiteVisit {
   id              String        @id @default(cuid())
+  tenantId        String
   leadId          String
   agentId         String?
   scheduledAt     DateTime
@@ -157,6 +159,8 @@ model SiteVisit {
   updatedAt       DateTime      @updatedAt
   agent           User?         @relation(fields: [agentId], references: [id])
   lead            Lead          @relation(fields: [leadId], references: [id])
+
+  @@index([tenantId])
 }
 
 model Activity {
@@ -166,11 +170,13 @@ model Activity {
   type        ActivityType
   description String
   metadata    Json         @default("{}")
+  tenantId    String
   createdAt   DateTime     @default(now())
   lead        Lead         @relation(fields: [leadId], references: [id])
   user        User?        @relation(fields: [userId], references: [id])
 
   @@index([leadId])
+  @@index([tenantId])
 }
 
 model Broker {
@@ -273,6 +279,7 @@ model Automation {
 model AutomationLog {
   id           String     @id @default(cuid())
   automationId String
+  tenantId     String
   leadId       String?
   status       String
   output       Json       @default("{}")

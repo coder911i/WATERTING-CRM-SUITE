@@ -47,7 +47,7 @@ export class AuthService {
           passwordHash,
           name: dto.name,
           phone: dto.phone,
-          role: UserRole.ADMIN,
+          role: UserRole.TENANT_ADMIN,
         },
       });
 

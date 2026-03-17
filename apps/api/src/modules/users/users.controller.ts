@@ -15,14 +15,14 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
   @ApiOperation({ summary: 'List all users in tenant' })
   async findAll() {
     return this.usersService.findAll();
   }
 
   @Patch(':id/role')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.TENANT_ADMIN)
   @ApiOperation({ summary: 'Update user role' })
   async updateRole(
     @Param('id') id: string,

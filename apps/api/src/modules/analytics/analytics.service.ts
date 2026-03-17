@@ -9,7 +9,7 @@ export class AnalyticsService {
   async getDashboard() {
     const [leadsCount, newLeadsCount, visitsCount, units] = await Promise.all([
       this.prisma.lead.count({ where: { isActive: true } }),
-      this.prisma.lead.count({ where: { isActive: true, stage: PipelineStage.NEW } }),
+      this.prisma.lead.count({ where: { isActive: true, stage: PipelineStage.NEW_LEAD } }),
       this.prisma.siteVisit.count(),
       this.prisma.unit.findMany(),
     ]);

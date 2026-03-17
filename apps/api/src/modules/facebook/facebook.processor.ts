@@ -57,8 +57,8 @@ export class FacebookProcessor {
           phone: formattedPhone,
           email: email || null,
           source: 'FACEBOOK',
-          stage: 'NEW',
-          priority: 'MEDIUM',
+          stage: 'NEW_LEAD',
+          priority: 'NORMAL',
         },
       });
 

@@ -15,6 +15,7 @@ export class PaymentsService {
     return this.prisma.payment.create({
       data: {
         bookingId,
+        tenantId: booking.tenantId,
         amount: dto.amount,
         dueDate: new Date(dto.dueDate),
         status: 'PENDING',

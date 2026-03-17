@@ -23,7 +23,7 @@ export class BrokersController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.TENANT_ADMIN, UserRole.SALES_MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Add broker manually' })
   async create(@Body() dto: CreateBrokerDto) {
@@ -46,7 +46,7 @@ export class BrokersController {
 
   @Patch(':id/approve')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.TENANT_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Approve broker account' })
   async approve(@Param('id') id: string) {
@@ -55,7 +55,7 @@ export class BrokersController {
 
   @Patch(':id/deactivate')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.TENANT_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Deactivate broker' })
   async deactivate(@Param('id') id: string) {
