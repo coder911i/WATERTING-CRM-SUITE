@@ -36,7 +36,7 @@ export class SiteVisitsService {
           agentId: userId,
           scheduledAt: dto.scheduledAt,
           notes: dto.notes,
-        },
+        } as any,
       });
       await tx.activity.create({
         data: {
@@ -44,7 +44,7 @@ export class SiteVisitsService {
           userId,
           type: 'SITE_VISIT',
           description: `Site visit scheduled for ${dto.scheduledAt.toLocaleString()}`,
-        },
+        } as any,
       });
       return visit;
     });
@@ -70,7 +70,7 @@ export class SiteVisitsService {
           userId,
           type: 'NOTE', 
           description: `Site visit outcome updated to ${dto.outcome}. Notes: ${dto.notes || 'N/A'}`,
-        },
+        } as any,
       });
       return updated;
     });

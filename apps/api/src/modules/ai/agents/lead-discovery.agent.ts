@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import OpenAI from 'openai';
 import { getOpenAIClient, getModelName } from '../llm.provider';
 import { DISCOVERY_SYSTEM_PROMPT } from '../prompts/lead-discovery.prompt';
+import { tenantContextStorage } from '../../../common/context/tenant-context';
 
 @Injectable()
 export class LeadDiscoveryAgent {
@@ -13,7 +14,10 @@ export class LeadDiscoveryAgent {
     this.openai = getOpenAIClient();
   }
 
-  async runDiscovery(tenantId: string) {
+  async runDiscovery() {
+    const context = tenantContextStorage.getStore();
+    const tenantId = context?.tenantId;
+    
     this.logger.log(`Running Lead Discovery for tenant ${tenantId}`);
 
     const mockCrawlerResults = `

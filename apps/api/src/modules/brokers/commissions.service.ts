@@ -36,7 +36,7 @@ export class CommissionsService {
         amount: commissionAmount,
         percentage: broker.commissionPct,
         status: 'PENDING',
-      },
+      } as any,
     });
   }
 }

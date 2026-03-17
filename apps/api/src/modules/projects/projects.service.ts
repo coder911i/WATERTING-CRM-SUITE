@@ -23,7 +23,7 @@ export class ProjectsService {
 
   async create(dto: CreateProjectDto) {
     return this.prisma.project.create({
-      data: dto,
+      data: dto as any,
     });
   }
 
@@ -42,7 +42,7 @@ export class ProjectsService {
 
     return this.prisma.project.update({
       where: { id },
-      data: dto,
+      data: dto as any,
     });
   }
 
@@ -51,7 +51,7 @@ export class ProjectsService {
     if (!project) throw new NotFoundException('Project not found');
 
     return this.prisma.tower.create({
-      data: { ...dto, projectId },
+      data: { ...dto, projectId } as any,
     });
   }
 }

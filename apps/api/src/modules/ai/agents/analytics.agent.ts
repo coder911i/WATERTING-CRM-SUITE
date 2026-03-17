@@ -4,6 +4,7 @@ import { getLLM } from '../llm.provider';
 import { createAgent } from 'langchain';
 import { DynamicTool } from '@langchain/core/tools';
 import { ANALYTICS_SYSTEM_PROMPT } from '../prompts/analytics.prompt';
+import { tenantContextStorage } from '../../../common/context/tenant-context';
 
 @Injectable()
 export class AnalyticsAgent {
@@ -11,7 +12,10 @@ export class AnalyticsAgent {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async runQuery(tenantId: string, question: string) {
+  async runQuery(question: string) {
+    const context = tenantContextStorage.getStore();
+    const tenantId = context?.tenantId;
+    
     this.logger.log(`Running analytics query for tenant ${tenantId}`);
 
     const model = getLLM({ temperature: 0.2 });

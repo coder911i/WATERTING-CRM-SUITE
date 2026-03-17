@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import Razorpay from 'razorpay';
+import { PaymentMethod } from '@prisma/client';
 
 @Injectable()
 export class PaymentsService {

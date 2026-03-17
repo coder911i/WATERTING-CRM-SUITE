@@ -43,7 +43,7 @@ export class PipelineService {
           userId,
           type: 'NOTE',
           description: `Stage moved from ${lead.stage} to ${stage}`,
-        },
+        } as any,
       });
       return updated;
     });

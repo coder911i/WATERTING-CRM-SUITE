@@ -30,7 +30,7 @@ export class InventoryService {
     if (!tower) throw new NotFoundException('Tower not found or unauthorized');
 
     return this.prisma.unit.create({
-      data: dto,
+      data: dto as any,
     });
   }
 
@@ -42,7 +42,7 @@ export class InventoryService {
 
     return this.prisma.unit.update({
       where: { id },
-      data: dto,
+      data: dto as any,
     });
   }
 

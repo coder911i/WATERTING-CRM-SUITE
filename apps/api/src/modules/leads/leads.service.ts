@@ -42,7 +42,7 @@ export class LeadsService {
     if (existing) throw new ConflictException('Lead with this phone number already exists');
 
     const lead = await this.prisma.lead.create({
-      data: dto,
+      data: dto as any,
     });
 
     await this.aiService.triggerScoring(lead.id);
@@ -65,7 +65,7 @@ export class LeadsService {
 
     return this.prisma.lead.update({
       where: { id },
-      data: dto,
+      data: dto as any,
     });
   }
 
@@ -94,7 +94,7 @@ export class LeadsService {
           userId,
           type: 'NOTE',
           description: `Stage changed to ${stage}`,
-        },
+        } as any,
       });
       return updatedLead;
     });
@@ -104,6 +104,16 @@ export class LeadsService {
 
   async getRecommendations(id: string) {
     const lead = await this.findOne(id);
-    return this.recommendAgent.recommend(lead);
+    return this.recommendAgent.recommendProperties(lead.id);
+  }
+
+  async assign(id: string, agentId: string) {
+    const lead = await this.prisma.lead.findFirst({ where: { id, isActive: true } });
+    if (!lead) throw new NotFoundException('Lead not found');
+
+    return this.prisma.lead.update({
+      where: { id },
+      data: { assignedToId: agentId },
+    });
   }
 }

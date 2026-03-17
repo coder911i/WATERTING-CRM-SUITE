@@ -25,7 +25,7 @@ export class BrokersService {
         commissionPct: dto.commissionPct || 2.0,
         referralCode,
         isApproved: false, // requires admin approval
-      },
+      } as any,
     });
   }
 

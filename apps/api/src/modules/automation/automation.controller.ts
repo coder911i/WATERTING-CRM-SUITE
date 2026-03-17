@@ -30,7 +30,7 @@ export class AutomationController {
         trigger: body.trigger,
         conditions: body.conditions || [],
         actions: body.actions,
-      },
+      } as any,
     });
   }
 }
