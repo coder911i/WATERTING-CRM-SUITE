@@ -14,7 +14,7 @@ export default function LeadsPage() {
     queryKey: ['leads'],
     queryFn: async () => {
       const res = await apiClient.get('/leads');
-      return res.data;
+      return res;
     },
     placeholderData: [
       { id: '1', name: 'John Doe', stage: 'NEW_LEAD', budgetMax: 5000000, source: 'WEBSITE', project: { name: 'Aqua Vista' } },
@@ -95,4 +95,5 @@ export default function LeadsPage() {
     </DashboardLayout>
   );
 }
+
 

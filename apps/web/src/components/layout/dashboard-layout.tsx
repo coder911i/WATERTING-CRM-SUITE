@@ -2,9 +2,11 @@
 
 import Sidebar from './sidebar';
 import Navbar from './navbar';
+import { AuthGuard } from '@/components/auth-guard';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
+    <AuthGuard>
     <div className="flex h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors duration-200">
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -14,5 +16,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
       </div>
     </div>
+    </AuthGuard>
   );
 }

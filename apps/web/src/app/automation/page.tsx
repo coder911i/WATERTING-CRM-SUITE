@@ -16,7 +16,7 @@ export default function AutomationPage() {
     queryKey: ['automations'],
     queryFn: async () => {
       const res = await apiClient.get('/automations');
-      return res.data;
+      return res;
     },
   });
 
@@ -119,3 +119,4 @@ export default function AutomationPage() {
     </DashboardLayout>
   );
 }
+

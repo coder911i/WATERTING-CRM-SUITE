@@ -14,8 +14,8 @@ export default function AiDashboardPage() {
   const { data: insights } = useQuery({
     queryKey: ['ai-insights'],
     queryFn: async () => {
-      const res = await apiClient.get('/ai/insights'); // wait, we don't have a direct insights endpoint setup!
-      return res.data;
+      const res = await apiClient.get<any>('/ai/insights'); 
+      return res;
     },
     placeholderData: [
       { id: '1', type: 'DAILY', title: 'Daily Performance Summary', body: '3 new leads created, 0 bookings yesterday.', createdAt: new Date() },
@@ -25,8 +25,8 @@ export default function AiDashboardPage() {
 
   const analyticsMutation = useMutation({
     mutationFn: async (q: string) => {
-      const res = await apiClient.post('/ai/analytics/query', { question: q });
-      return res.data;
+      const res = await apiClient.post<any>('/ai/analytics/query', { question: q });
+      return res;
     },
     onSuccess: (data) => {
       setAnalyticsAnswer(data.answer);

@@ -25,7 +25,7 @@ export default function DashboardPage() {
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       const res = await apiClient.get('/analytics/dashboard');
-      return res.data;
+      return res;
     },
     placeholderData: {
       totalLeads: 124,
@@ -39,7 +39,7 @@ export default function DashboardPage() {
     queryKey: ['leads-by-status'],
     queryFn: async () => {
       const res = await apiClient.get('/analytics/leads-by-status');
-      return res.data;
+      return res;
     },
     placeholderData: {
       NEW_LEAD: 12,
@@ -142,3 +142,4 @@ export default function DashboardPage() {
     </DashboardLayout>
   );
 }
+

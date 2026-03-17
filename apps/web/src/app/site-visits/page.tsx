@@ -9,7 +9,7 @@ export default function SiteVisitsPage() {
     queryKey: ['site-visits'],
     queryFn: async () => {
       const res = await apiClient.get('/site-visits');
-      return res.data;
+      return res;
     },
     placeholderData: [
       { id: '1', scheduledAt: '2026-12-15T10:00:00Z', notes: 'Interested in level 5', lead: { name: 'John Doe' }, agent: { name: 'Agent Smith' }, outcome: null },
@@ -61,3 +61,4 @@ export default function SiteVisitsPage() {
     </DashboardLayout>
   );
 }
+

@@ -12,7 +12,7 @@ export default function LeadDetailPage() {
     queryKey: ['lead', id],
     queryFn: async () => {
       const res = await apiClient.get(`/leads/${id}`);
-      return res.data;
+      return res;
     },
     placeholderData: {
       id,
@@ -30,7 +30,7 @@ export default function LeadDetailPage() {
     queryKey: ['lead-activities', id],
     queryFn: async () => {
       const res = await apiClient.get(`/activities?leadId=${id}`);
-      return res.data;
+      return res;
     },
     placeholderData: [
       { id: '1', type: 'SYSTEM', description: 'Lead captured from Website', createdAt: new Date() },

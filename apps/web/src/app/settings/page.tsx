@@ -1,10 +1,10 @@
 'use client';
 
 import DashboardLayout from '@/components/layout/dashboard-layout';
-import { useAuthStore } from '@/store/auth.store';
+import { useAuth } from '@/lib/auth-context';
 
 export default function SettingsPage() {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuth();
 
   return (
     <DashboardLayout>
@@ -33,6 +33,14 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+
+        <button 
+          onClick={logout} 
+          className="mt-4 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors"
+        >
+          Sign out
+        </button>
+
       </div>
     </DashboardLayout>
   );

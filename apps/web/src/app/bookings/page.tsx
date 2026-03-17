@@ -9,7 +9,7 @@ export default function BookingsPage() {
     queryKey: ['bookings'],
     queryFn: async () => {
       const res = await apiClient.get('/bookings');
-      return res.data;
+      return res;
     },
   });
 
@@ -62,3 +62,4 @@ export default function BookingsPage() {
     </DashboardLayout>
   );
 }
+

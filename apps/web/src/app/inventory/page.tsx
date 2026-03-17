@@ -9,7 +9,7 @@ export default function InventoryPage() {
     queryKey: ['units'],
     queryFn: async () => {
       const res = await apiClient.get('/inventory');
-      return res.data;
+      return res;
     },
     placeholderData: [
       { id: '1', unitNumber: '101', floor: 1, tower: { name: 'Tower A', project: { name: 'Aqua Vista' } }, status: 'AVAILABLE', superArea: 1200, totalPrice: 4500000 },
@@ -70,3 +70,4 @@ export default function InventoryPage() {
     </DashboardLayout>
   );
 }
+

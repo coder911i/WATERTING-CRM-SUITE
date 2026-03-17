@@ -29,7 +29,7 @@ export default function LeadDrawer({ isOpen, onClose, onSuccess }: { isOpen: boo
     try {
       await apiClient.post('/leads', {
         ...data,
-        phone: data.phone.replace(/\s+/g, ''),
+        phone: data.phone.trim().replace(/[\s\-().]/g, ''),
         email: data.email || undefined,
       });
       onSuccess();

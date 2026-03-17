@@ -10,7 +10,7 @@ export default function PipelinePage() {
     queryKey: ['kanban'],
     queryFn: async () => {
       const res = await apiClient.get('/pipeline');
-      return res.data;
+      return res;
     },
     placeholderData: {
       NEW_LEAD: { count: 1, totalBudget: 5000000, leads: [{ id: '1', name: 'John Doe', project: { name: 'Aqua Vista' }, budgetMax: 5000000, source: 'WEBSITE' }] },
@@ -33,3 +33,4 @@ export default function PipelinePage() {
     </DashboardLayout>
   );
 }
+

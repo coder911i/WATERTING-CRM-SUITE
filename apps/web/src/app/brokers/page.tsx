@@ -9,7 +9,7 @@ export default function BrokersPage() {
     queryKey: ['brokers'],
     queryFn: async () => {
       const res = await apiClient.get('/brokers');
-      return res.data;
+      return res;
     },
   });
 
@@ -93,3 +93,4 @@ export default function BrokersPage() {
     </DashboardLayout>
   );
 }
+

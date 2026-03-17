@@ -9,7 +9,7 @@ export default function AnalyticsPage() {
     queryKey: ['analytics-brokers'],
     queryFn: async () => {
       const res = await apiClient.get('/analytics/brokers');
-      return res.data;
+      return res;
     },
   });
 
@@ -17,7 +17,7 @@ export default function AnalyticsPage() {
     queryKey: ['analytics-projects'],
     queryFn: async () => {
       const res = await apiClient.get('/analytics/projects');
-      return res.data;
+      return res;
     },
   });
 
@@ -25,7 +25,7 @@ export default function AnalyticsPage() {
     queryKey: ['analytics-forecast'],
     queryFn: async () => {
       const res = await apiClient.get('/analytics/forecast');
-      return res.data;
+      return res;
     },
   });
 
@@ -92,3 +92,4 @@ export default function AnalyticsPage() {
     </DashboardLayout>
   );
 }
+

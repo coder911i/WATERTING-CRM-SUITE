@@ -9,7 +9,7 @@ export default function ProjectsPage() {
     queryKey: ['projects'],
     queryFn: async () => {
       const res = await apiClient.get('/projects');
-      return res.data;
+      return res;
     },
     placeholderData: [
       { id: '1', name: 'Aqua Vista', location: 'Navi Mumbai', projectType: 'RESIDENTIAL', status: 'ACTIVE', amenities: ['Pool', 'Gym'] },
@@ -57,3 +57,4 @@ export default function ProjectsPage() {
     </DashboardLayout>
   );
 }
+
