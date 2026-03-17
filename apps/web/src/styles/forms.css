@@ -117,7 +117,7 @@ select:disabled {
   background-color: #f3f4f6 !important; /* Light gray bg */
   border-color: #e5e7eb !important; /* Lighter border */
   color: #9ca3af !important; /* Gray text */
-  cursor: not-allowed !allowed !important;
+  cursor: not-allowed !important;
   opacity: 0.6 !important;
 }
 
