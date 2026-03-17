@@ -17,13 +17,13 @@ export default function KanbanItem({ id, lead }: { id: string; lead: any }) {
       style={style}
       {...listeners}
       {...attributes}
-      className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
+      className="bg-neutral-0 dark:bg-neutral-800 p-4 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 cursor-grab active:cursor-grabbing hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-150 text-neutral-900 dark:text-neutral-100"
     >
-      <h4 className="text-sm font-semibold text-gray-900">{lead.name}</h4>
-      <p className="text-xs text-gray-500 mt-1">{lead.project?.name || 'No Project'}</p>
-      <div className="mt-3 flex items-center justify-between">
-        <span className="text-xs font-medium text-gray-600">₹{lead.budgetMax?.toLocaleString() || 'N/A'}</span>
-        <span className="text-xxs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600 capitalize">{lead.source?.toLowerCase()}</span>
+      <h4 className="text-sm font-semibold">{lead.name}</h4>
+      <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{lead.project?.name || 'No Project'}</p>
+      <div className="mt-4 flex items-center justify-between gap-1">
+        <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">₹{lead.budgetMax?.toLocaleString() || 'N/A'}</span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400 capitalize">{lead.source?.toLowerCase() || 'other'}</span>
       </div>
     </div>
   );

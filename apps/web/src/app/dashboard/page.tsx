@@ -4,6 +4,8 @@ import DashboardLayout from '@/components/layout/dashboard-layout';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
+import { Card, KpiCard } from '@/components/Card';
+import { Users, UserPlus, Calendar, Home } from 'lucide-react';
 
 interface DashboardStats {
   totalLeads: number;
@@ -16,7 +18,7 @@ interface DashboardStats {
   };
 }
 
-const COLORS = ['#0D9488', '#F59E0B', '#EF4444', '#3B82F6'];
+const COLORS = ['#1B60E0', '#FF9F40', '#4BC0C0', '#F59E0B'];
 
 export default function DashboardPage() {
   const { data: stats } = useQuery<DashboardStats>({
@@ -66,50 +68,58 @@ export default function DashboardPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Workspace Dashboard</h1>
-          <p className="text-sm text-gray-500">Overview of your sales and inventory statistics.</p>
+          <h1 className="text-3xl font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight">Workspace Overview</h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Status dashboard for sales metrics and inventory analytics.</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-sm font-medium text-gray-500">Total Leads</h3>
-            <p className="mt-2 text-3xl font-semibold text-gray-900">{stats?.totalLeads ?? 0}</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-sm font-medium text-gray-500">New Leads</h3>
-            <p className="mt-2 text-3xl font-semibold text-teal-600">{stats?.newLeads ?? 0}</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-sm font-medium text-gray-500">Site Visits</h3>
-            <p className="mt-2 text-3xl font-semibold text-purple-600">{stats?.siteVisits ?? 0}</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-sm font-medium text-gray-500">Available Units</h3>
-            <p className="mt-2 text-3xl font-semibold text-blue-600">{stats?.inventory.available ?? 0}</p>
-          </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <KpiCard 
+            title="Total Leads" 
+            value={stats?.totalLeads ?? 0} 
+            icon={<Users className="h-5 w-5" />}
+            trend={{ value: "+12% from last week", type: "up" }}
+          />
+          <KpiCard 
+            title="New Leads" 
+            value={stats?.newLeads ?? 0} 
+            icon={<UserPlus className="h-5 w-5" />}
+            trend={{ value: "12 Today", type: "neutral" }}
+          />
+          <KpiCard 
+            title="Site Visits" 
+            value={stats?.siteVisits ?? 0} 
+            icon={<Calendar className="h-5 w-5" />}
+            trend={{ value: "-4% from yesterday", type: "down" }}
+          />
+          <KpiCard 
+            title="Available Units" 
+            value={stats?.inventory.available ?? 0} 
+            icon={<Home className="h-5 w-5" />}
+          />
         </div>
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-md font-semibold text-gray-800 mb-4">Leads by Pipeline Stage</h3>
-            <div className="h-64">
+          <Card title="Leads by Pipeline Stage">
+            <div className="h-64 mt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={pieData}>
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#0D9488" radius={[4, 4, 0, 0]} />
+                <BarChart data={pieData} barSize={32}>
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} axisLine={false} tickLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#FFF', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }} 
+                    labelStyle={{ fontWeight: '600', color: '#111827' }}
+                  />
+                  <Bar dataKey="value" fill="#1B60E0" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-md font-semibold text-gray-800 mb-4">Inventory Breakdown</h3>
-            <div className="h-64 flex items-center">
+          <Card title="Inventory Breakdown">
+            <div className="h-64 flex items-center justify-center">
               <ResponsiveContainer width="60%" height="100%">
                 <PieChart>
-                  <Pie data={inventoryData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                  <Pie data={inventoryData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={4} dataKey="value">
                     {inventoryData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
@@ -121,15 +131,14 @@ export default function DashboardPage() {
                 {inventoryData.map((item, index) => (
                   <div key={item.name} className="flex items-center">
                     <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                    <span className="text-xs text-gray-600">{item.name}: {item.value}</span>
+                    <span className="text-sm text-neutral-600 dark:text-neutral-400">{item.name}: <span className="font-semibold text-neutral-900 dark:text-neutral-100">{item.value}</span></span>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </DashboardLayout>
   );
 }
-
